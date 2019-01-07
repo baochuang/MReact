@@ -32,4 +32,6 @@ function instantiateReactComponent(node) {
     } else if (typeof node === 'string' || typeof node === 'number') {
         instance = ReactHostComponent.createInstanceForText(node)
     }
+
+    return instance
 }

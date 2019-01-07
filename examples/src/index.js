@@ -7,6 +7,8 @@ class App extends Component {
     }
 }
 
-const rootElement = document.querySelector('#root')
+const rootContainer = document.querySelector('#root')
 
-render(<App />, rootElement)
+const element = <App />
+
+render(element, rootContainer)

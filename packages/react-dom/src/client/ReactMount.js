@@ -1,5 +1,11 @@
 import { createElement } from '../../../react/src/React'
 import { DOC_NODE_TYPE } from '../../../constants/NodeType'
+import instantiateReactComponent from '../../../react-reconciler/src/instantiateReactComponent'
+import ReactUpdates from '../../../react-reconciler/src/ReactUpdates'
+
+const TopLevelWrapper = function() {
+    this.rootID = topLevelRootCounter++
+};
 
 function getReactRootElementInContainer(container) {
     if (!container) {
@@ -29,6 +35,10 @@ function getTopLevelWrapperInContainer(container) {
 const ReactMount = {
     _renderNewRootComponent: function(element, container) {
         const componentInstance = instantiateReactComponent(nextElement)
+
+        ReactUpdates.batchedUpdates(batchedMountComponentIntoNode, componentInstance, container)
+
+        return componentInstance
     },
     _renderSubtreeIntoContainer: function (parentComponent, element, container, callback) {
         // ReactUpdateQueue.validateCallback(callback, 'ReactDOM.render')
