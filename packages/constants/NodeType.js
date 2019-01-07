@@ -1,0 +1,1 @@
+export const DOC_NODE_TYPE = 9

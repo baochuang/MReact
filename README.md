@@ -1,2 +1,2 @@
 # MReact
-For React Study
+Simulate React
