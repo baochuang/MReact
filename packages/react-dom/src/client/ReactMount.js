@@ -2,6 +2,43 @@ import { createElement } from '../../../react/src/React'
 import { DOC_NODE_TYPE } from '../../../constants/NodeType'
 import instantiateReactComponent from '../../../react-reconciler/src/instantiateReactComponent'
 import ReactUpdates from '../../../react-reconciler/src/ReactUpdates'
+import ReactDOMContainerInfo from '../ReactDOMContainerInfo'
+import setInnerHTML from '../../../utils/setInnerHTML'
+
+function mountComponentIntoNode(
+    wrapperInstance,
+    container,
+    transaction
+) {
+    const markup = ReactReconciler.mountComponent(
+        wrapperInstance,
+        transaction,
+        null,
+        ReactDOMContainerInfo(wrapperInstance, container)
+    )
+
+    ReactMount._mountImageIntoNode(
+        markup,
+        container,
+        wrapperInstance,
+        transaction
+    )
+}
+
+function batchedMountComponentIntoNode (
+    componentInstance,
+    container
+) {
+    const transaction = ReactUpdates.ReactReconcileTransaction.getPooled()
+
+    transaction.perform(
+        mountComponentIntoNode,
+        null,
+        componentInstance,
+        container,
+        transaction
+    )
+}
 
 const TopLevelWrapper = function() {
     this.rootID = topLevelRootCounter++
@@ -40,19 +77,35 @@ const ReactMount = {
 
         return componentInstance
     },
+    _mountImageIntoNode: function(
+        markup,
+        container,
+        wrapperInstance,
+        transaction
+    ){
+        if (transaction.useCreateElement) {
+            while (container.lastChild) {
+                container.removeChild(container.lastChild)
+            }
+            DOMLazyTree.insertTreeBefore(container, markup, null)
+        } else {
+            setInnerHTML(container, markup)
+            // ReactDOMComponentTree.precacheNode(instance, container.firstChild)
+        }
+    },
     _renderSubtreeIntoContainer: function (parentComponent, element, container, callback) {
         // ReactUpdateQueue.validateCallback(callback, 'ReactDOM.render')
-        const wrappedElement = createElement(TopLevelWrapper, {
+        const wrappedElement = React.createElement(TopLevelWrapper, {
             child: element,
         })
 
-        const prevComponent = getTopLevelWrapperInContainer(container)
+        // const prevComponent = getTopLevelWrapperInContainer(container)
 
-        if (prevComponent) {
+        // if (prevComponent) {
 
-        }
+        // }
 
-        const reactRootElement = getReactRootElementInContainer(container)
+        // const reactRootElement = getReactRootElementInContainer(container)
 
         const component = ReactMount._renderNewRootComponent(
             wrappedElement,
