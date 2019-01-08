@@ -1,4 +1,4 @@
-const { Component } = React 
+// const { Component } = React 
 const { render } = ReactDOM
 
 class App extends Component {

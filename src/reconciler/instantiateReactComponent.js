@@ -1,5 +1,3 @@
-import ReactCompositeComponent from './ReactCompositeComponent'
-
 const ReactCompositeComponentWrapper = function(element) {
     this.construct(element);
 }
@@ -40,5 +38,3 @@ function instantiateReactComponent(node) {
 
     return instance
 }
-
-export default instantiateReactComponent

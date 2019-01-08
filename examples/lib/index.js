@@ -1,6 +1,4 @@
-const {
-  Component
-} = React;
+// const { Component } = React 
 const {
   render
 } = ReactDOM;

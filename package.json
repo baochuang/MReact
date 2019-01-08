@@ -1,4 +1,11 @@
 {
     "name": "mreact",
-    "version": "0.0.1"
+    "version": "0.0.1",
+    "scripts": {
+        "gulp": "gulp"
+    },
+    "devDependencies": {
+        "gulp": "^4.0.0",
+        "gulp-concat": "^2.6.1"
+    }
 }

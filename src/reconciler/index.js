@@ -1,5 +1,5 @@
-import instantiateReactComponent from './instantiateReactComponent'
-
 const Reconciler = {
-    instantiateReactComponent
+    instantiateReactComponent,
+    ReactCompositeComponent,
+    ReactReconciler
 }

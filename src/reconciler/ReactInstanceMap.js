@@ -6,5 +6,3 @@ const ReactInstanceMap = {
         key._reactInternalInstance = value;
     }
 }
-
-export default ReactInstanceMap

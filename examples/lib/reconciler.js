@@ -1,3 +1,30 @@
+const ReactInstanceMap = {
+    get: function(key) {
+        return key._reactInternalInstance
+    },
+    set: function(key, value) {
+        key._reactInternalInstance = value;
+    }
+}
+const ReactReconciler = {
+    mountComponent: function (
+        internalInstance,
+        transaction,
+        nativeParent,
+        nativeContainerInfo
+    ) {
+        const markup = internalInstance.mountComponent(
+            transaction,
+            nativeParent,
+            nativeContainerInfo
+        ) 
+        if ( internalInstance._currentElement &&
+            internalInstance._currentElement.ref !== null) {
+
+        }
+        return markup
+    }
+}
 function StatelessComponent(Component) {}
 
 StatelessComponent.prototype.render = function() {
@@ -121,4 +148,49 @@ ReactCompositeComponentMixin.getPublicInstance = function() {
 
 const ReactCompositeComponent = {
     Mixin: ReactCompositeComponentMixin
+}
+const ReactCompositeComponentWrapper = function(element) {
+    this.construct(element);
+}
+
+Object.assign(
+    ReactCompositeComponentWrapper.prototype,
+    ReactCompositeComponent.Mixin,
+    {
+      _instantiateReactComponent: instantiateReactComponent,
+    }
+)
+
+function isInternalComponentType(type) {
+    return (
+        typeof type === 'function' &&
+        typeof type.prototype !== 'undefined' &&
+        typeof type.prototype.mountComponent === 'function' &&
+        typeof type.prototype.receiveComponent === 'function'
+      )
+}
+
+function instantiateReactComponent(node) {
+    let instance 
+    
+    if (typeof node === 'object') {
+        const type = node.type
+
+        if (typeof type === 'string') {
+            
+        } else if (isInternalComponentType(type)) {
+            
+        } else {
+            instance = new ReactCompositeComponentWrapper(element)
+        }
+    } else if (typeof node === 'string' || typeof node === 'number') {
+        
+    }
+
+    return instance
+}
+const Reconciler = {
+    instantiateReactComponent,
+    ReactCompositeComponent,
+    ReactReconciler
 }
