@@ -1,34 +1,24 @@
 const ReactDOM = { }
 
-let topLevelRootCounter = 1;
-
-const TopLevelWrapper = function() {
-    this.rootID = topLevelRootCounter++
-}
-
 ReactDOM.render = function(element, container, callback) {
-    this.renderSubtreeIntoContainer(
-        null,
-        nextElement,
+    this._renderSubtreeIntoContainer(
+        element,
         container,
         callback,
     )
 }
 
-ReactDOM.renderSubtreeIntoContainer = function (parentComponent, element, container, callback) {
-    const wrappedElement = React.createElement(TopLevelWrapper, {
-        child: element
-    })
+ReactDOM._renderSubtreeIntoContainer = function (element, container) {
 
-    const component = this.renderNewRootComponent(
-        wrappedElement,
+    const component = this._renderNewRootComponent(
+        element,
         container
     )._renderedComponent.getPublicInstance()
 
     return component
 }
 
-ReactDOM.renderNewRootComponent = function(element, container) {
+ReactDOM._renderNewRootComponent = function(element, container) {
     const componentInstance = instantiateReactComponent(element)
 
     batchedMountComponentIntoNode(componentInstance, container)

@@ -10,6 +10,7 @@ StatelessComponent.prototype.render = function() {
 const ReactCompositeComponentMixin = {
     construct: function(element) {
         this._currentElement = element
+        this._renderedComponent = null
     },
     mountComponent: function(
         transaction,

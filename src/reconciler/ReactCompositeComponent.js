@@ -12,6 +12,7 @@ const ReactCompositeComponentMixin = { }
 
 ReactCompositeComponentMixin.construct = function(element) {
         this._currentElement = element
+        this._renderedComponent = null
 }
 
 ReactCompositeComponentMixin.mountComponent = function(
@@ -63,6 +64,33 @@ ReactCompositeComponentMixin.mountComponent = function(
 
 ReactCompositeComponentMixin._processProps = function(newProps) {
     return newProps
+}
+
+ReactCompositeComponentMixin.performInitialMount = function(
+    renderedElement,
+    nativeParent, 
+    nativeContainerInfo, 
+    transaction
+) {
+    const inst = this._instance
+
+    if (inst.componentWillMount) {
+        inst.componentWillMount()
+    }
+    // If not a stateless component, we now render
+    if (renderedElement === undefined) {
+        renderedElement = this._renderValidatedComponent()
+    }
+}
+
+ReactCompositeComponentMixin._renderValidatedComponent = function() {
+    let renderedComponent
+
+    try {
+        renderedComponent = this._renderValidatedComponentWithoutOwnerOrContext()
+    } finally {
+        return renderedComponent
+    }
 }
 
 const ReactCompositeComponent = {

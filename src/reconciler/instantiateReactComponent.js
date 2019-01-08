@@ -1,3 +1,5 @@
+import ReactCompositeComponent from './ReactCompositeComponent'
+
 const ReactCompositeComponentWrapper = function(element) {
     this.construct(element);
 }
