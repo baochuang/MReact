@@ -17,3 +17,5 @@ const ReactReconciler = {
         return markup
     }
 }
+
+export default ReactReconciler

@@ -1,4 +1,5 @@
 const CONTENT_TYPES = {'string': true, 'number': true}
+import DOMLazyTree from '../../utils/DOMLazyTree'
 
 function ReactDOMComponent(element) {
     const tag = element.type
@@ -61,3 +62,5 @@ Object.assign(
     ReactDOMComponent.prototype,
     ReactDOMComponent.Mixin
 )
+
+export default ReactDOMComponent

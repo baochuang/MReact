@@ -1,11 +1,12 @@
-import {
-    render
-} from './ReactMount'
+import ReactMount from './ReactMount'
+const { render } = ReactMount
 
 import ReactDefaultInjection from '../ReactDefaultInjection'
+
+ReactDefaultInjection.inject()
 
 const ReactDOM = {
     render
 }
 
-export default ReactDOM
+window.ReactDOM = ReactDOM

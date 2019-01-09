@@ -45,3 +45,5 @@ DOMLazyTree.queueText = function(tree, text) {
         setTextContent(tree.node, text);
     }
 }
+
+export default DOMLazyTree

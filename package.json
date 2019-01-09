@@ -2,10 +2,13 @@
     "name": "mreact",
     "version": "0.0.1",
     "scripts": {
-        "gulp": "gulp"
+        "gulp": "gulp",
+        "webpack": "webpack"
     },
     "devDependencies": {
         "gulp": "^4.0.0",
-        "gulp-concat": "^2.6.1"
+        "gulp-concat": "^2.6.1",
+        "webpack": "^4.28.1",
+        "webpack-cli": "^3.2.1"
     }
 }

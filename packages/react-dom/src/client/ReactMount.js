@@ -1,10 +1,12 @@
 import ReactElement from '../../../react/src/ReactElement'
 import { emptyObject } from '../../../constants'
-import { DOC_NODE_TYPE } from '../../../constants/NodeType'
 import instantiateReactComponent from '../../../react-reconciler/src/instantiateReactComponent'
 import ReactDOMContainerInfo from '../ReactDOMContainerInfo'
 import setInnerHTML from '../../../utils/setInnerHTML'
 import DOMLazyTree from '../../../utils/DOMLazyTree'
+import ReactReconciler from '../../../react-reconciler/src/ReactReconciler'
+
+let topLevelRootCounter = 1
 
 function mountComponentIntoNode(
     wrapperInstance,
@@ -42,6 +44,13 @@ function batchedMountComponentIntoNode (
 const TopLevelWrapper = function() {
     this.rootID = topLevelRootCounter++
 };
+
+TopLevelWrapper.prototype.isReactComponent = {};
+
+TopLevelWrapper.prototype.render = function() {
+  // this.props is actually a ReactElement
+  return this.props;
+}
 
 const ReactMount = {
     _renderNewRootComponent: function(nextElement, container, context) {
@@ -98,3 +107,5 @@ const ReactMount = {
         )
     }
 }
+
+export default ReactMount

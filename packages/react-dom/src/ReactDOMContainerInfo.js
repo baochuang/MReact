@@ -1,3 +1,5 @@
+import { DOC_NODE_TYPE } from '../../constants/NodeType'
+
 function ReactDOMContainerInfo(topLevelWrapper, node) {
     const info = {
         _topLevelWrapper: topLevelWrapper,

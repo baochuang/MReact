@@ -1,6 +1,7 @@
-import {
-    createElement
-} from './ReactElement'
+import ReactElement from './ReactElement'
+
+const { createElement } = ReactElement
+
 import ReactComponent from './ReactComponent'
 
 const React = {
@@ -8,4 +9,4 @@ const React = {
     Component: ReactComponent
 }
 
-export default React
+window.React = React
