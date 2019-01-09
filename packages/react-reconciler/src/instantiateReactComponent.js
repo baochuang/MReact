@@ -1,9 +1,17 @@
-import ReactEmptyComponent from './ReactEmptyComponent'
-import ReactHostComponent from './ReactHostComponent'
+import ReactNativeComponent from './ReactNativeComponent'
+import ReactCompositeComponent from './ReactCompositeComponent'
 
 const ReactCompositeComponentWrapper = function(element) {
     this.construct(element);
 }
+
+Object.assign(
+    ReactCompositeComponentWrapper.prototype,
+    ReactCompositeComponent.Mixin,
+    {
+      _instantiateReactComponent: instantiateReactComponent,
+    }
+)
 
 function isInternalComponentType(type) {
     return (
@@ -18,19 +26,19 @@ function instantiateReactComponent(node) {
     let instance 
 
     if (node === null || node === false) {
-        instance = ReactEmptyComponent.create(instantiateReactComponent)
+
     } else if (typeof node === 'object') {
         const type = node.type
 
         if (typeof type === 'string') {
-            instance = ReactHostComponent.createInternalComponent(element)
+            instance = ReactNativeComponent.createInternalComponent(element)
         } else if (isInternalComponentType(type)) {
             instance = new type(element)
         } else {
             instance = new ReactCompositeComponentWrapper(element)
         }
     } else if (typeof node === 'string' || typeof node === 'number') {
-        instance = ReactHostComponent.createInstanceForText(node)
+        instance = ReactNativeComponent.createInstanceForText(node)
     }
 
     return instance

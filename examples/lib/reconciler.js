@@ -6,21 +6,30 @@ const ReactInstanceMap = {
         key._reactInternalInstance = value;
     }
 }
+const ReactNativeComponent = {
+    injection: ReactNativeComponentInjection = {
+        injectGenericComponentClass: function(componentClass) {
+            ReactNativeComponent.genericComponentClass = componentClass
+        }
+    },
+    createInternalComponent: function(element) {
+        return new ReactNativeComponent.genericComponentClass(element)
+    },
+
+    genericComponentClass: null
+}
 const ReactReconciler = {
     mountComponent: function (
         internalInstance,
-        transaction,
         nativeParent,
         nativeContainerInfo
     ) {
         const markup = internalInstance.mountComponent(
-            transaction,
             nativeParent,
             nativeContainerInfo
         ) 
         if ( internalInstance._currentElement &&
             internalInstance._currentElement.ref !== null) {
-
         }
         return markup
     }
@@ -41,7 +50,6 @@ ReactCompositeComponentMixin.construct = function(element) {
 }
 
 ReactCompositeComponentMixin.mountComponent = function(
-    transaction,
     nativeParent,
     nativeContainerInfo
 ) {
@@ -77,7 +85,7 @@ ReactCompositeComponentMixin.mountComponent = function(
         if (inst.unstable_handleError) {
 
         } else {
-            markup = this.performInitialMount(renderedElement,nativeParent, nativeContainerInfo, transaction)
+            markup = this.performInitialMount(renderedElement, nativeParent, nativeContainerInfo)
         }
 
         if (inst.componentDidMount) {
@@ -94,8 +102,7 @@ ReactCompositeComponentMixin._processProps = function(newProps) {
 ReactCompositeComponentMixin.performInitialMount = function(
     renderedElement,
     nativeParent, 
-    nativeContainerInfo, 
-    transaction
+    nativeContainerInfo
 ) {
     const inst = this._instance
 
@@ -111,7 +118,6 @@ ReactCompositeComponentMixin.performInitialMount = function(
 
     const markup = ReactReconciler.mountComponent(
         this._renderedComponent,
-        transaction,
         nativeParent,
         nativeContainerInfo
     )
@@ -175,9 +181,9 @@ function instantiateReactComponent(node) {
     
     if (typeof node === 'object') {
         const type = node.type
-
+        const element = node
         if (typeof type === 'string') {
-            
+            instance = ReactNativeComponent.createInternalComponent(element)
         } else if (isInternalComponentType(type)) {
             
         } else {

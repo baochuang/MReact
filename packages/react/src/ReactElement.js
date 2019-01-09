@@ -9,28 +9,23 @@ const ReactElement = function(type, key, ref, props) {
     return element
 }
 
-export function createElement(type, config, children) {
+ReactElement.createElement = function(type, config, children) {
 
     const props = {}
 
     let key = null
     let ref = null
-
+    
     if (config) {
-        if (config.ref) {
-            ref = config.ref
-        }
-        if (config.key) {
-            key = ` ${config.key}`
-        }
 
-        for ( prop in config ) {
-            if (prop !== 'key' && prop !== 'ref') {
-                props[prop] = config[prop]
-            }
-        }
+    } 
+
+    const childrenLength = arguments.length - 2
+
+    if (childrenLength.length === 1) {
+        props.children = children
     }
-
+    
     return ReactElement(
         type,
         key,
@@ -38,3 +33,5 @@ export function createElement(type, config, children) {
         props,
     )
 }
+
+export default ReactElement

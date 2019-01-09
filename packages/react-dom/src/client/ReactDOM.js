@@ -4,8 +4,6 @@ import {
 
 import ReactDefaultInjection from '../ReactDefaultInjection'
 
-ReactDefaultInjection.inject()
-
 const ReactDOM = {
     render
 }

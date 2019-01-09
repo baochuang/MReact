@@ -14,7 +14,6 @@ ReactCompositeComponentMixin.construct = function(element) {
 }
 
 ReactCompositeComponentMixin.mountComponent = function(
-    transaction,
     nativeParent,
     nativeContainerInfo
 ) {
@@ -50,7 +49,7 @@ ReactCompositeComponentMixin.mountComponent = function(
         if (inst.unstable_handleError) {
 
         } else {
-            markup = this.performInitialMount(renderedElement,nativeParent, nativeContainerInfo, transaction)
+            markup = this.performInitialMount(renderedElement, nativeParent, nativeContainerInfo)
         }
 
         if (inst.componentDidMount) {
@@ -67,8 +66,7 @@ ReactCompositeComponentMixin._processProps = function(newProps) {
 ReactCompositeComponentMixin.performInitialMount = function(
     renderedElement,
     nativeParent, 
-    nativeContainerInfo, 
-    transaction
+    nativeContainerInfo
 ) {
     const inst = this._instance
 
@@ -84,7 +82,6 @@ ReactCompositeComponentMixin.performInitialMount = function(
 
     const markup = ReactReconciler.mountComponent(
         this._renderedComponent,
-        transaction,
         nativeParent,
         nativeContainerInfo
     )

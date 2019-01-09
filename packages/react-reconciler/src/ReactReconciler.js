@@ -1,14 +1,14 @@
 const ReactReconciler = {
     mountComponent: function (
         internalInstance,
-        transaction,
         nativeParent,
-        nativeContainerInfo
+        nativeContainerInfo,
+        context
     ) {
         const markup = internalInstance.mountComponent(
-            transaction,
             nativeParent,
-            nativeContainerInfo
+            nativeContainerInfo,
+            context
         ) 
         if ( internalInstance._currentElement &&
             internalInstance._currentElement.ref !== null) {

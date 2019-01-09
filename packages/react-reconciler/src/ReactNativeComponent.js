@@ -18,8 +18,10 @@ function createInstanceForText(node) {
     return new textComponentClass(text)
 }
 
-const ReactHostComponent = {
+const ReactNativeComponent = {
     createInternalComponent,
     createInstanceForText,
     injection: ReactHostComponentInjection
 }
+
+export default ReactNativeComponent

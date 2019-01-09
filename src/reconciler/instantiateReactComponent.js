@@ -24,9 +24,9 @@ function instantiateReactComponent(node) {
     
     if (typeof node === 'object') {
         const type = node.type
-
+        const element = node
         if (typeof type === 'string') {
-            
+            instance = ReactNativeComponent.createInternalComponent(element)
         } else if (isInternalComponentType(type)) {
             
         } else {

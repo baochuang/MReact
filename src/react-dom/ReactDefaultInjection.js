@@ -1,0 +1,4 @@
+
+ReactInjection.NativeComponent.injectGenericComponentClass(
+    ReactDOMComponent
+)

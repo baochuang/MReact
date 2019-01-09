@@ -1,5 +1,7 @@
-import ReactUpdates from '../../react-reconciler/src/ReactUpdates'
+import ReactNativeComponent from '../../react-reconciler/src/ReactNativeComponent'
 
 const ReactInjection = {
-    Updates: ReactUpdates.injection
+    NativeComponent: ReactNativeComponent.injection
 }
+
+export default ReactInjection

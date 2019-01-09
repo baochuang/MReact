@@ -1,22 +1,17 @@
 import ReactInjection from './ReactInjection'
-import ReactDefaultBatchingStrategy from './ReactDefaultBatchingStrategy'
-
-let alreadyInjected = false
-
-const inject = function () {
-    if (alreadyInjected) {
-        return 
-    }
-
-    alreadyInjected = true
-
-    ReactInjection.Updates.injectBatchingStrategy(
-        ReactDefaultBatchingStrategy
-    )
-}
+import ReactDOMComponent from './ReactDOMComponent'
+import ReactDOMTextComponent from './ReactDOMTextComponent'
 
 const ReactDefaultInjection = {
-    inject
+    inject: function() {
+        ReactInjection.NativeComponent.injectGenericComponentClass(
+            ReactDOMComponent
+        )
+        
+        ReactInjection.NativeComponent.injectTextComponentClass(
+            ReactDOMTextComponent
+        )
+    }
 }
 
 export default ReactDefaultInjection

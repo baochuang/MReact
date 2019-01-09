@@ -2,14 +2,21 @@ const { src, parallel, dest } = require('gulp')
 const concat = require('gulp-concat')
 
 function concatReactDom() {
-    return src('./src/react-dom/*.js')
+    return src([
+        './src/react-dom/ReactDOMComponent.js',
+        './src/react-dom/ReactInjection.js',
+        './src/react-dom/ReactDefaultInjection.js',
+        './src/react-dom/ReactDOMContainerInfo.js',
+        './src/react-dom/index.js'
+        ])
         .pipe(concat('react-dom.js'))
         .pipe(dest('./examples/lib/'))
 }
 
 function concatReconciler() {
     return src([
-        './src/reconciler/ReactInstanceMap.js', 
+        './src/reconciler/ReactInstanceMap.js',
+        './src/reconciler/ReactNativeComponent.js', 
         './src/reconciler/ReactReconciler.js', 
         './src/reconciler/ReactCompositeComponent.js',
         './src/reconciler/instantiateReactComponent.js',
@@ -30,4 +37,10 @@ function concatConstants() {
         .pipe(dest('./examples/lib/'))
 }
 
-exports.default = parallel(concatReactDom, concatReconciler, concatReact, concatConstants)
+function concatUtils() {
+    return src('./src/utils/*.js')
+        .pipe(concat('utils.js'))
+        .pipe(dest('./examples/lib/'))
+}
+
+exports.default = parallel(concatReactDom, concatReconciler, concatReact, concatConstants, concatUtils)

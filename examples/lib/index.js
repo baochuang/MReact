@@ -1,9 +1,4 @@
-// const { Component } = React 
-const {
-  render
-} = ReactDOM;
-
-class App extends Component {
+class App extends React.Component {
   render() {
     return React.createElement("div", null, "Hello World");
   }
@@ -12,4 +7,4 @@ class App extends Component {
 
 const rootContainer = document.querySelector('#root');
 const element = React.createElement(App, null);
-render(element, rootContainer);
+ReactDOM.render(element, rootContainer);

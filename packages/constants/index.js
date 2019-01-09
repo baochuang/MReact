@@ -7,3 +7,5 @@ export const canUseLazy = !!(
     typeof navigator.userAgent === 'string' &&
     /\bEdge\/\d/.test(navigator.userAgent)
 )
+
+export const emptyObject = {}

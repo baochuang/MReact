@@ -4,6 +4,7 @@ function mountComponentIntoNode(
 ) {
     const markup = ReactReconciler.mountComponent(
         wrapperInstance,
+        null,
         ReactDOMContainerInfo(wrapperInstance, container)
     )
 

@@ -1,7 +1,3 @@
-import { DOCUMENTFRAGMENT_NODE_TYPE } from '../constants/NodeType'
-import { canUseLazy } from '../constants'
-import setTextContent from './setTextContent'
-
 function insertTreeChildren(tree) {
     if (!canUseLazy) {
         return 
@@ -37,11 +33,6 @@ DOMLazyTree.insertTreeBefore = function(parentNode, tree, referenceNode) {
         insertTreeChildren(tree)
     }
 }
-
-DOMLazyTree.queueText = function(tree, text) {
-    if (enableLazy) {
-        tree.text = text;
-    } else {
-        setTextContent(tree.node, text);
-    }
+const setTextContent = function(node, text) {
+    node.textContent = text
 }
