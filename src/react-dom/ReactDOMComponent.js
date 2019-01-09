@@ -1,4 +1,4 @@
-const STYLE = keyOf({style: null})
+const CONTENT_TYPES = {'string': true, 'number': true}
 
 class ReactDOMComponent {
     constructor(element) {
@@ -88,14 +88,39 @@ class ReactDOMComponent {
     }
 
     _updateDOMProperties(lastProps, nextProps, transaction) {
-        for (propKey in nextProps) {
-            const nextProp = nextProps[propKey]
-            // 治理得到的undefined
-            const lastProp = propKey === STYLE ? this._previousStyleCopy :
-                lastProps != null ? lastProps[propKey] : undefined
-            
+        //
+    }
+
+    _createInitialChildren(transaction, props, context, lazyTree) {
+        const innerHTML = props.dangerouslySetInnerHTML
+
+        if (innerHTML) {
+
+        } else {
+            const contentToUse = CONTENT_TYPES[typeof props.children] ? props.children : null
+            const childrenToUse = contentToUse != null ? null : props.children
+
+            if (contentToUse != null) {
+                // 将文本绑定到节点上去
+                DOMLazyTree.queueText(lazyTree, contentToUse);
+              } else if (childrenToUse != null) {
+                // 还不知道干啥
+                const mountImages = this.mountChildren(
+                  childrenToUse,
+                  transaction,
+                  context
+                )
+                for (var i = 0; i < mountImages.length; i++) {
+                  DOMLazyTree.queueChild(lazyTree, mountImages[i]);
+                }
+              }
         }
     }
 }
 
 ReactDOMComponent.displayName = 'ReactDOMComponent'
+
+Object.assign(
+    ReactDOMComponent,
+    ReactMultiChild
+)

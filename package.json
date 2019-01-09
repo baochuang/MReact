@@ -3,9 +3,18 @@
     "version": "0.0.1",
     "scripts": {
         "gulp": "gulp",
-        "webpack": "webpack"
+        "webpack": "webpack",
+        "babel": "babel examples/src/index.js --out-dir examples/lib",
+        "test": "webpack & babel examples/src/index.js --out-dir examples/lib"
+    },
+    "dependencies": {
+        "react": "15.0.0",
+        "react-dom": "15.0.0"
     },
     "devDependencies": {
+        "@babel/cli": "^7.2.3",
+        "@babel/core": "^7.2.2",
+        "@babel/plugin-transform-react-jsx": "^7.2.0",
         "gulp": "^4.0.0",
         "gulp-concat": "^2.6.1",
         "webpack": "^4.28.1",
