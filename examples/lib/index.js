@@ -1,6 +1,6 @@
 class App extends React.Component {
   render() {
-    return React.createElement("div", null, "Hello World");
+    return React.createElement("div", null, React.createElement("h5", null, "Hello World"));
   }
 
 }

@@ -1,5 +1,8 @@
+const REACT_ELEMENT_TYPE = (typeof Symbol === 'function' && Symbol.for && Symbol.for('react.element')) || 0xeac7
+
 const ReactElement = function(type, key, ref, self, props) {
     const element = {
+        $$typeof: REACT_ELEMENT_TYPE,
         type: type,
         key: key,
         ref: ref,
@@ -34,4 +37,11 @@ ReactElement.createElement = function(type, config, children) {
     )
 }
 
+ReactElement.isValidElement =  function(object) {
+    return (
+      typeof object === 'object' &&
+      object !== null &&
+      object.$$typeof === REACT_ELEMENT_TYPE
+    )
+}
 export default ReactElement

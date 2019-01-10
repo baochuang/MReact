@@ -725,6 +725,43 @@ const setTextContent = function(node, text) {
 
 /***/ }),
 
+/***/ "./version-one/react-reconciler/ReactChildReconciler.js":
+/*!**************************************************************!*\
+  !*** ./version-one/react-reconciler/ReactChildReconciler.js ***!
+  \**************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _utils_traverseAllChildren__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils/traverseAllChildren */ "./version-one/utils/traverseAllChildren.js");
+/* harmony import */ var _instantiateReactComponent__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./instantiateReactComponent */ "./version-one/react-reconciler/instantiateReactComponent.js");
+
+
+
+function instantiateChild(childInstances, child, name) {
+    // We found a component instance.
+    var keyUnique = (childInstances[name] === undefined);
+    if (child != null && keyUnique) {
+      childInstances[name] = Object(_instantiateReactComponent__WEBPACK_IMPORTED_MODULE_1__["default"])(child);
+    }
+}
+
+const ReactChildReconciler = {
+    instantiateChildren: function(nestedChildNodes, transaction, context) {
+        if (nestedChildNodes == null) {
+          return null
+        }
+        var childInstances = {}
+        Object(_utils_traverseAllChildren__WEBPACK_IMPORTED_MODULE_0__["default"])(nestedChildNodes, instantiateChild, childInstances)
+        return childInstances
+    }
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (ReactChildReconciler);
+
+/***/ }),
+
 /***/ "./version-one/react-reconciler/ReactCompositeComponent.js":
 /*!*****************************************************************!*\
   !*** ./version-one/react-reconciler/ReactCompositeComponent.js ***!
@@ -963,12 +1000,39 @@ const ReactInstanceMap = {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _ReactReconciler__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ReactReconciler */ "./version-one/react-reconciler/ReactReconciler.js");
+/* harmony import */ var _ReactChildReconciler__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ReactChildReconciler */ "./version-one/react-reconciler/ReactChildReconciler.js");
+
+
+
 const ReactMultiChild = {
     mountChildren: function(nestedChildren, transaction, context) {
-        
+        const children = this._reconcilerInstantiateChildren(
+            nestedChildren, transaction, context
+        )
+        this._renderedChildren = children
+        let mountImages = [];
+        let index = 0;
+        for (let name in children) {
+          if (children.hasOwnProperty(name)) {
+            var child = children[name]
+            var mountImage = _ReactReconciler__WEBPACK_IMPORTED_MODULE_0__["default"].mountComponent(
+              child,
+              transaction,
+              this,
+              this._nativeContainerInfo,
+              context
+            );
+            child._mountIndex = index++;
+            mountImages.push(mountImage);
+          }
+        }
+        return mountImages
     },
     _reconcilerInstantiateChildren: function(nestedChildren, transaction, context) {
-
+        return _ReactChildReconciler__WEBPACK_IMPORTED_MODULE_1__["default"].instantiateChildren(
+            nestedChildren, transaction, context
+        )
     }
 }
 
@@ -1128,8 +1192,11 @@ function instantiateReactComponent(node) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+const REACT_ELEMENT_TYPE = (typeof Symbol === 'function' && Symbol.for && Symbol.for('react.element')) || 0xeac7
+
 const ReactElement = function(type, key, ref, self, props) {
     const element = {
+        $$typeof: REACT_ELEMENT_TYPE,
         type: type,
         key: key,
         ref: ref,
@@ -1164,7 +1231,91 @@ ReactElement.createElement = function(type, config, children) {
     )
 }
 
+ReactElement.isValidElement =  function(object) {
+    return (
+      typeof object === 'object' &&
+      object !== null &&
+      object.$$typeof === REACT_ELEMENT_TYPE
+    )
+}
 /* harmony default export */ __webpack_exports__["default"] = (ReactElement);
+
+/***/ }),
+
+/***/ "./version-one/utils/traverseAllChildren.js":
+/*!**************************************************!*\
+  !*** ./version-one/utils/traverseAllChildren.js ***!
+  \**************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _react_ReactElement__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../react/ReactElement */ "./version-one/react/ReactElement.js");
+// 抄的 还没搞清楚
+
+
+const SEPARATOR = '.'
+
+const userProvidedKeyEscaperLookup = {
+    '=': '=0',
+    ':': '=2',
+  };
+  
+const userProvidedKeyEscapeRegex = /[=:]/g
+
+function traverseAllChildren(children, callback, traverseContext) {
+    if (children == null) {
+      return 0;
+    }
+  
+    return traverseAllChildrenImpl(children, '', callback, traverseContext);
+}
+
+function traverseAllChildrenImpl(
+    children,
+    nameSoFar,
+    callback,
+    traverseContext
+) {
+    const type = typeof children
+
+    if (children === null || type === 'string' || type === 'number' || _react_ReactElement__WEBPACK_IMPORTED_MODULE_0__["default"].isValidElement(children)) {
+        callback(traverseContext, children,
+        // If it's the only child, treat the name as if it was wrapped in an array
+        // so that it's consistent if the number of children grows.
+        nameSoFar === '' ? SEPARATOR + getComponentKey(children, 0) : nameSoFar)
+        return 1
+    }
+}
+
+function getComponentKey(component, index) {
+    // Do some typechecking here since we call this blindly. We want to ensure
+    // that we don't block potential future ES APIs.
+    if (component && typeof component === 'object' && component.key != null) {
+      // Explicit key
+      return wrapUserProvidedKey(component.key)
+    }
+    // Implicit key determined by the index in the set
+    return index.toString(36)
+}
+
+function wrapUserProvidedKey(key) {
+    return '$' + escapeUserProvidedKey(key)
+}
+
+function escapeUserProvidedKey(text) {
+    return ('' + text).replace(
+      userProvidedKeyEscapeRegex,
+      userProvidedKeyEscaper
+    )
+}
+
+function userProvidedKeyEscaper(match) {
+    return userProvidedKeyEscaperLookup[match]
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (traverseAllChildren);
 
 /***/ })
 
