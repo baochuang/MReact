@@ -5,7 +5,6 @@ const ReactElement = function(type, key, ref, self, props) {
         ref: ref,
         props: props,
     }
-
     return element
 }
 
@@ -22,8 +21,7 @@ ReactElement.createElement = function(type, config, children) {
     } 
 
     const childrenLength = arguments.length - 2
-
-    if (childrenLength.length === 1) {
+    if (childrenLength === 1) {
         props.children = children
     }
     
