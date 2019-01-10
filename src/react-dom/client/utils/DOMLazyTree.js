@@ -23,3 +23,11 @@ DOMLazyTree.queueText = function(tree, text) {
     setTextContent(tree.node, text);
   }
 }
+
+DOMLazyTree.queueChild = function(parentTree, childTree) {
+  if (enableLazy) {
+    parentTree.children.push(childTree);
+  } else {
+    parentTree.node.appendChild(childTree.node);
+  }
+}

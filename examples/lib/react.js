@@ -81,26 +81,23 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = "./packages/react/src/React.js");
+/******/ 	return __webpack_require__(__webpack_require__.s = "./version-one/react/index.js");
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ "./packages/constants/index.js":
-/*!*************************************!*\
-  !*** ./packages/constants/index.js ***!
-  \*************************************/
-/*! exports provided: internalInstanceKey, canUseLazy, emptyObject */
+/***/ "./version-one/constants/index.js":
+/*!****************************************!*\
+  !*** ./version-one/constants/index.js ***!
+  \****************************************/
+/*! exports provided: enableLazy, emptyObject */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "internalInstanceKey", function() { return internalInstanceKey; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "canUseLazy", function() { return canUseLazy; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "enableLazy", function() { return enableLazy; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "emptyObject", function() { return emptyObject; });
-const internalInstanceKey = '__reactInternalInstance$' + Math.random().toString(36).slice(2)
-
-const canUseLazy = !!(
+const enableLazy = !!(
     typeof document !== undefined &&
     typeof document.documentMode === 'number' ||
     typeof navigator !== 'undefined' &&
@@ -112,70 +109,46 @@ const emptyObject = {}
 
 /***/ }),
 
-/***/ "./packages/react/src/React.js":
-/*!*************************************!*\
-  !*** ./packages/react/src/React.js ***!
-  \*************************************/
-/*! no exports provided */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _ReactElement__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ReactElement */ "./packages/react/src/ReactElement.js");
-/* harmony import */ var _ReactComponent__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ReactComponent */ "./packages/react/src/ReactComponent.js");
-
-
-const { createElement } = _ReactElement__WEBPACK_IMPORTED_MODULE_0__["default"]
-
-
-
-const React = {
-    createElement,
-    Component: _ReactComponent__WEBPACK_IMPORTED_MODULE_1__["default"]
-}
-
-window.React = React
-
-/***/ }),
-
-/***/ "./packages/react/src/ReactComponent.js":
-/*!**********************************************!*\
-  !*** ./packages/react/src/ReactComponent.js ***!
-  \**********************************************/
+/***/ "./version-one/react/ReactComponent.js":
+/*!*********************************************!*\
+  !*** ./version-one/react/ReactComponent.js ***!
+  \*********************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../constants */ "./packages/constants/index.js");
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ReactComponent; });
+/* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../constants */ "./version-one/constants/index.js");
 
 
-function ReactComponent(props, context, updater) {
-    this.props = props;
-    this.context = context;
-    this.refs = _constants__WEBPACK_IMPORTED_MODULE_0__["emptyObject"];
+class ReactComponent {
+    constructor(props, context, updater) {
+        this.props = props
+        this.context = context
+        this.refs = _constants__WEBPACK_IMPORTED_MODULE_0__["emptyObject"]
+        this.updater = updater
+    }
+
+    setState(partialState, callback) {
+
+    }
 }
 
 ReactComponent.prototype.isReactComponent = {}
 
-ReactComponent.prototype.setState = function(partialState, callback) {
-
-}
-
-/* harmony default export */ __webpack_exports__["default"] = (ReactComponent);
-
 /***/ }),
 
-/***/ "./packages/react/src/ReactElement.js":
-/*!********************************************!*\
-  !*** ./packages/react/src/ReactElement.js ***!
-  \********************************************/
+/***/ "./version-one/react/ReactElement.js":
+/*!*******************************************!*\
+  !*** ./version-one/react/ReactElement.js ***!
+  \*******************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-const ReactElement = function(type, key, ref, props) {
+const ReactElement = function(type, key, ref, self, props) {
     const element = {
         type: type,
         key: key,
@@ -192,7 +165,8 @@ ReactElement.createElement = function(type, config, children) {
 
     let key = null
     let ref = null
-    
+    let self = null
+
     if (config) {
 
     } 
@@ -207,11 +181,38 @@ ReactElement.createElement = function(type, config, children) {
         type,
         key,
         ref,
+        self,
         props,
     )
 }
 
 /* harmony default export */ __webpack_exports__["default"] = (ReactElement);
+
+/***/ }),
+
+/***/ "./version-one/react/index.js":
+/*!************************************!*\
+  !*** ./version-one/react/index.js ***!
+  \************************************/
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _ReactElement__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ReactElement */ "./version-one/react/ReactElement.js");
+/* harmony import */ var _ReactComponent__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ReactComponent */ "./version-one/react/ReactComponent.js");
+
+
+const { createElement } = _ReactElement__WEBPACK_IMPORTED_MODULE_0__["default"]
+
+
+
+const React = {
+    createElement,
+    Component: _ReactComponent__WEBPACK_IMPORTED_MODULE_1__["default"]
+}
+
+window.React = React
 
 /***/ })
 

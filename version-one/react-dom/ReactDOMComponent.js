@@ -1,8 +1,15 @@
+import ReactMultiChild from '../react-reconciler/ReactMultiChild'
+import DOMNamespaces from './DOMNamespaces'
+import DOMPropertyOperations from './DOMPropertyOperations'
+import DOMLazyTree from './client/utils/DOMLazyTree'
+
+import { getNodeFromInstance } from './client/ReactDOMComponentTree'
+
 const CONTENT_TYPES = {'string': true, 'number': true}
 
 class ReactDOMComponent {
     constructor(element) {
-        const tag = element.tag
+        const tag = element.type
         // for diff
         this._domID = null
 
@@ -53,7 +60,7 @@ class ReactDOMComponent {
         let mountImage
 
         // 创建
-        if (transaction.useCreateElement || true) {
+        if (transaction && transaction.useCreateElement || true) {
             const ownerDocument = nativeContainerInfo._ownerDocument
             let el 
 
@@ -117,11 +124,17 @@ class ReactDOMComponent {
               }
         }
     }
+
+    getPublicInstance() {
+        return getNodeFromInstance(this)
+    }
 }
 
 ReactDOMComponent.displayName = 'ReactDOMComponent'
 
 Object.assign(
-    ReactDOMComponent,
+    ReactDOMComponent.prototype,
     ReactMultiChild
 )
+
+export default ReactDOMComponent

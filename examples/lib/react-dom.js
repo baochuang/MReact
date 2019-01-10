@@ -81,15 +81,38 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = "./packages/react-dom/src/client/ReactDOM.js");
+/******/ 	return __webpack_require__(__webpack_require__.s = "./version-one/react-dom/client/ReactDOM.js");
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ "./packages/constants/NodeType.js":
+/***/ "./version-one/constants/index.js":
 /*!****************************************!*\
-  !*** ./packages/constants/NodeType.js ***!
+  !*** ./version-one/constants/index.js ***!
   \****************************************/
+/*! exports provided: enableLazy, emptyObject */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "enableLazy", function() { return enableLazy; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "emptyObject", function() { return emptyObject; });
+const enableLazy = !!(
+    typeof document !== undefined &&
+    typeof document.documentMode === 'number' ||
+    typeof navigator !== 'undefined' &&
+    typeof navigator.userAgent === 'string' &&
+    /\bEdge\/\d/.test(navigator.userAgent)
+)
+
+const emptyObject = {}
+
+/***/ }),
+
+/***/ "./version-one/constants/nodeTypes.js":
+/*!********************************************!*\
+  !*** ./version-one/constants/nodeTypes.js ***!
+  \********************************************/
 /*! exports provided: ELEMENT_NODE_TYPE, ATTR_NODE_TYPE, TEXT_NODE_TYPE, CDATASECTION_NODE_TYPE, ENTITYREFERENCE_NODE_TYPE, ENTITY_NODE_TYPE, PROCESSINGINSTRUCTION_NODE_TYPE, COMMENT_NODE_TYPE, DOC_NODE_TYPE, DOCUMENTFRAGMENT_NODE_TYPE */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -118,128 +141,238 @@ const DOCUMENTFRAGMENT_NODE_TYPE = 11 // 轻量级的文档处理对象
 
 /***/ }),
 
-/***/ "./packages/constants/index.js":
-/*!*************************************!*\
-  !*** ./packages/constants/index.js ***!
-  \*************************************/
-/*! exports provided: internalInstanceKey, canUseLazy, emptyObject */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "internalInstanceKey", function() { return internalInstanceKey; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "canUseLazy", function() { return canUseLazy; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "emptyObject", function() { return emptyObject; });
-const internalInstanceKey = '__reactInternalInstance$' + Math.random().toString(36).slice(2)
-
-const canUseLazy = !!(
-    typeof document !== undefined &&
-    typeof document.documentMode === 'number' ||
-    typeof navigator !== 'undefined' &&
-    typeof navigator.userAgent === 'string' &&
-    /\bEdge\/\d/.test(navigator.userAgent)
-)
-
-const emptyObject = {}
-
-/***/ }),
-
-/***/ "./packages/react-dom/src/ReactDOMComponent.js":
-/*!*****************************************************!*\
-  !*** ./packages/react-dom/src/ReactDOMComponent.js ***!
-  \*****************************************************/
+/***/ "./version-one/react-dom/DOMNamespaces.js":
+/*!************************************************!*\
+  !*** ./version-one/react-dom/DOMNamespaces.js ***!
+  \************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _utils_DOMLazyTree__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../utils/DOMLazyTree */ "./packages/utils/DOMLazyTree.js");
-const CONTENT_TYPES = {'string': true, 'number': true}
-
-
-function ReactDOMComponent(element) {
-    const tag = element.type
-
-    this._tag = tag.toLowerCase()
-    this._currentElement = element
+const DOMNamespaces = {
+    html: 'http://www.w3.org/1999/xhtml',
+    mathml: 'http://www.w3.org/1998/Math/MathML',
+    svg: 'http://www.w3.org/2000/svg',
 }
 
-ReactDOMComponent.displayName = 'ReactDOMComponent'
+/* harmony default export */ __webpack_exports__["default"] = (DOMNamespaces);
 
-ReactDOMComponent.Mixin = {
-    mountComponent: function(
+/***/ }),
+
+/***/ "./version-one/react-dom/DOMProperty.js":
+/*!**********************************************!*\
+  !*** ./version-one/react-dom/DOMProperty.js ***!
+  \**********************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+const DOMProperty = {
+    ROOT_ATTRIBUTE_NAME: 'data-reactroot'
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (DOMProperty);
+
+/***/ }),
+
+/***/ "./version-one/react-dom/DOMPropertyOperations.js":
+/*!********************************************************!*\
+  !*** ./version-one/react-dom/DOMPropertyOperations.js ***!
+  \********************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _DOMProperty__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./DOMProperty */ "./version-one/react-dom/DOMProperty.js");
+
+
+const DOMPropertyOperations = {
+    setAttributeForRoot: function(node) {
+        node.setAttribute(_DOMProperty__WEBPACK_IMPORTED_MODULE_0__["default"].ROOT_ATTRIBUTE_NAME, '')
+    }
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (DOMPropertyOperations);
+
+/***/ }),
+
+/***/ "./version-one/react-dom/ReactDOMComponent.js":
+/*!****************************************************!*\
+  !*** ./version-one/react-dom/ReactDOMComponent.js ***!
+  \****************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _react_reconciler_ReactMultiChild__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../react-reconciler/ReactMultiChild */ "./version-one/react-reconciler/ReactMultiChild.js");
+/* harmony import */ var _DOMNamespaces__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./DOMNamespaces */ "./version-one/react-dom/DOMNamespaces.js");
+/* harmony import */ var _DOMPropertyOperations__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./DOMPropertyOperations */ "./version-one/react-dom/DOMPropertyOperations.js");
+/* harmony import */ var _client_utils_DOMLazyTree__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./client/utils/DOMLazyTree */ "./version-one/react-dom/client/utils/DOMLazyTree.js");
+/* harmony import */ var _client_ReactDOMComponentTree__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./client/ReactDOMComponentTree */ "./version-one/react-dom/client/ReactDOMComponentTree.js");
+
+
+
+
+
+
+
+const CONTENT_TYPES = {'string': true, 'number': true}
+
+class ReactDOMComponent {
+    constructor(element) {
+        const tag = element.type
+        // for diff
+        this._domID = null
+
+        this._currentElement = element
+        this._tag = tag.toLowerCase()
+        this._namespaceURI = null
+    }
+
+    mountComponent(
+        transaction = { useCreateElement: true},
         nativeParent,
         nativeContainerInfo,
         context
     ) {
+        this._domID = nativeContainerInfo._idCounter++
         this._nativeParent = nativeParent
         this._nativeContainerInfo = nativeContainerInfo
 
         const props = this._currentElement.props
 
+        // namespace 还没去研究干啥的
+        let namespaceURI
+        let parentTag
+
+        if (nativeParent) {
+            namespaceURI = nativeParent._namespaceURI
+            parentTag = nativeParent._tag
+        } else if (nativeContainerInfo._tag) {
+            namespaceURI = nativeContainerInfo._namespaceURI
+            parentTag = nativeContainerInfo._tag
+        }
+
+        if (namespaceURI == null ||
+            namespaceURI === _DOMNamespaces__WEBPACK_IMPORTED_MODULE_1__["default"].svg && parentTag === 'foreignobject') {
+                namespaceURI = _DOMNamespaces__WEBPACK_IMPORTED_MODULE_1__["default"].html
+        }
+
+        if (namespaceURI === _DOMNamespaces__WEBPACK_IMPORTED_MODULE_1__["default"].html) {
+            if (this._tag === 'svg') {
+              namespaceURI = _DOMNamespaces__WEBPACK_IMPORTED_MODULE_1__["default"].svg;
+            } else if (this._tag === 'math') {
+              namespaceURI = _DOMNamespaces__WEBPACK_IMPORTED_MODULE_1__["default"].mathml;
+            }
+        }
+
+        this._namespaceURI = namespaceURI
+
         let mountImage
 
-        if (true) {
+        // 创建
+        if (transaction && transaction.useCreateElement || true) {
             const ownerDocument = nativeContainerInfo._ownerDocument
+            let el 
 
-            const el = ownerDocument.createElement(this._currentElement.type)
+            if (namespaceURI === _DOMNamespaces__WEBPACK_IMPORTED_MODULE_1__["default"].html) {
+                if (this._tag === 'script') {
+                
+                } else {
+                    el = ownerDocument.createElement(this._currentElement.type)
+                } 
+            } else {
+                el = ownerDocument.createElementNS(
+                    namespaceURI,
+                    this._currentElement.type
+                )
+            }
 
-            const lazyTree = Object(_utils_DOMLazyTree__WEBPACK_IMPORTED_MODULE_0__["default"])(el);
-            
-            this._createInitialChildren(props, lazyTree);
-      
+            if (!this._nativeParent) {
+                _DOMPropertyOperations__WEBPACK_IMPORTED_MODULE_2__["default"].setAttributeForRoot(el);
+            }
+
+            this._updateDOMProperties(null, props, transaction)
+
+            const lazyTree = Object(_client_utils_DOMLazyTree__WEBPACK_IMPORTED_MODULE_3__["default"])(el)
+
+            this._createInitialChildren(transaction, props, context, lazyTree)
+
             mountImage = lazyTree
+        } else { // 更新
+
         }
 
         return mountImage
-    },
-    _createInitialChildren: function(
-        props,
-        lazyTree
-    ) {
-        const contentToUse = CONTENT_TYPES[typeof props.children] ? props.children : null;
-        const childrenToUse = contentToUse != null ? null : props.children;
-        if (contentToUse) {
-          // TODO: Validate that text is allowed as a child of this node
-          _utils_DOMLazyTree__WEBPACK_IMPORTED_MODULE_0__["default"].queueText(lazyTree, contentToUse);
-        } else if (childrenToUse) {
-            // const mountImages = this.mountChildren(childrenToUse, context);
-            // for (var i = 0; i < mountImages.length; i++) {
-            //     DOMLazyTree.queueChild(lazyTree, mountImages[i]);
-            // }
+    }
+
+    _updateDOMProperties(lastProps, nextProps, transaction) {
+        //
+    }
+
+    _createInitialChildren(transaction, props, context, lazyTree) {
+        const innerHTML = props.dangerouslySetInnerHTML
+
+        if (innerHTML) {
+
+        } else {
+            const contentToUse = CONTENT_TYPES[typeof props.children] ? props.children : null
+            const childrenToUse = contentToUse != null ? null : props.children
+
+            if (contentToUse != null) {
+                // 将文本绑定到节点上去
+                _client_utils_DOMLazyTree__WEBPACK_IMPORTED_MODULE_3__["default"].queueText(lazyTree, contentToUse);
+              } else if (childrenToUse != null) {
+                // 还不知道干啥
+                const mountImages = this.mountChildren(
+                  childrenToUse,
+                  transaction,
+                  context
+                )
+                for (var i = 0; i < mountImages.length; i++) {
+                  _client_utils_DOMLazyTree__WEBPACK_IMPORTED_MODULE_3__["default"].queueChild(lazyTree, mountImages[i]);
+                }
+              }
         }
-    },
-    getPublicInstance: function() {
-        return null;
+    }
+
+    getPublicInstance() {
+        return Object(_client_ReactDOMComponentTree__WEBPACK_IMPORTED_MODULE_4__["getNodeFromInstance"])(this)
     }
 }
 
+ReactDOMComponent.displayName = 'ReactDOMComponent'
+
 Object.assign(
     ReactDOMComponent.prototype,
-    ReactDOMComponent.Mixin
+    _react_reconciler_ReactMultiChild__WEBPACK_IMPORTED_MODULE_0__["default"]
 )
 
 /* harmony default export */ __webpack_exports__["default"] = (ReactDOMComponent);
 
 /***/ }),
 
-/***/ "./packages/react-dom/src/ReactDOMContainerInfo.js":
-/*!*********************************************************!*\
-  !*** ./packages/react-dom/src/ReactDOMContainerInfo.js ***!
-  \*********************************************************/
+/***/ "./version-one/react-dom/ReactDOMContainerInfo.js":
+/*!********************************************************!*\
+  !*** ./version-one/react-dom/ReactDOMContainerInfo.js ***!
+  \********************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _constants_NodeType__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../constants/NodeType */ "./packages/constants/NodeType.js");
+/* harmony import */ var _constants_nodeTypes__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../constants/nodeTypes */ "./version-one/constants/nodeTypes.js");
 
 
 function ReactDOMContainerInfo(topLevelWrapper, node) {
     const info = {
         _topLevelWrapper: topLevelWrapper,
         _ownerDocument: node ?
-            node.nodeType === _constants_NodeType__WEBPACK_IMPORTED_MODULE_0__["DOC_NODE_TYPE"] ?   
+            node.nodeType === _constants_nodeTypes__WEBPACK_IMPORTED_MODULE_0__["DOC_NODE_TYPE"] ?   
                 node : node.ownerDocument :
                     null
     }
@@ -250,112 +383,169 @@ function ReactDOMContainerInfo(topLevelWrapper, node) {
 
 /***/ }),
 
-/***/ "./packages/react-dom/src/ReactDOMTextComponent.js":
+/***/ "./version-one/react-dom/ReactDOMEmptyComponent.js":
 /*!*********************************************************!*\
-  !*** ./packages/react-dom/src/ReactDOMTextComponent.js ***!
-  \*********************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-
-
-/***/ }),
-
-/***/ "./packages/react-dom/src/ReactDefaultInjection.js":
-/*!*********************************************************!*\
-  !*** ./packages/react-dom/src/ReactDefaultInjection.js ***!
+  !*** ./version-one/react-dom/ReactDOMEmptyComponent.js ***!
   \*********************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _ReactInjection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ReactInjection */ "./packages/react-dom/src/ReactInjection.js");
-/* harmony import */ var _ReactDOMComponent__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ReactDOMComponent */ "./packages/react-dom/src/ReactDOMComponent.js");
-/* harmony import */ var _ReactDOMTextComponent__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ReactDOMTextComponent */ "./packages/react-dom/src/ReactDOMTextComponent.js");
-/* harmony import */ var _ReactDOMTextComponent__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_ReactDOMTextComponent__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ReactDOMEmptyComponent; });
+class ReactDOMEmptyComponent {
+    constructor(instantiate) {
+        // ReactCompositeComponent uses this:
+        this._currentElement = null
+        // ReactDOMComponentTree uses these:
+        this._nativeNode = null
+        this._nativeParent = null
+        this._nativeContainerInfo = null
+        this._domID = null
+    }
 
+    mountComponent(
+        transaction,
+        nativeParent,
+        nativeContainerInfo,
+        context
+    ) {
 
+    }
 
-
-const ReactDefaultInjection = {
-    inject: function() {
-        _ReactInjection__WEBPACK_IMPORTED_MODULE_0__["default"].NativeComponent.injectGenericComponentClass(
-            _ReactDOMComponent__WEBPACK_IMPORTED_MODULE_1__["default"]
-        )
+    receiveComponent() {
         
-        _ReactInjection__WEBPACK_IMPORTED_MODULE_0__["default"].NativeComponent.injectTextComponentClass(
-            _ReactDOMTextComponent__WEBPACK_IMPORTED_MODULE_2___default.a
-        )
     }
 }
 
-/* harmony default export */ __webpack_exports__["default"] = (ReactDefaultInjection);
+/***/ }),
+
+/***/ "./version-one/react-dom/ReactDOMTextComponent.js":
+/*!********************************************************!*\
+  !*** ./version-one/react-dom/ReactDOMTextComponent.js ***!
+  \********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+
+class ReactDOMTextComponent {
+    constructor(text) {
+        this._currentElement = text
+
+        this._nativeNode = null
+        this._nativeParent = null
+
+        this._domID = null
+    }
+
+    mountComponent(
+        transaction,
+        nativeParent,
+        nativeContainerInfo,
+        context
+    ) {
+
+    }
+
+    receiveComponent(nextText, transaction) {
+    
+    }
+}
 
 /***/ }),
 
-/***/ "./packages/react-dom/src/ReactInjection.js":
+/***/ "./version-one/react-dom/TopLevelWrapper.js":
 /*!**************************************************!*\
-  !*** ./packages/react-dom/src/ReactInjection.js ***!
+  !*** ./version-one/react-dom/TopLevelWrapper.js ***!
   \**************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _react_reconciler_src_ReactNativeComponent__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../react-reconciler/src/ReactNativeComponent */ "./packages/react-reconciler/src/ReactNativeComponent.js");
+let topLevelRootCounter = 1
 
-
-const ReactInjection = {
-    NativeComponent: _react_reconciler_src_ReactNativeComponent__WEBPACK_IMPORTED_MODULE_0__["default"].injection
+const TopLevelWrapper = function() {
+    this.rootID = topLevelRootCounter++
 }
 
-/* harmony default export */ __webpack_exports__["default"] = (ReactInjection);
+TopLevelWrapper.prototype.isReactComponent = {}
+
+TopLevelWrapper.prototype.render = function() {
+    console.log(this)
+    return this.props
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (TopLevelWrapper);
 
 /***/ }),
 
-/***/ "./packages/react-dom/src/client/ReactDOM.js":
-/*!***************************************************!*\
-  !*** ./packages/react-dom/src/client/ReactDOM.js ***!
-  \***************************************************/
+/***/ "./version-one/react-dom/client/ReactDOM.js":
+/*!**************************************************!*\
+  !*** ./version-one/react-dom/client/ReactDOM.js ***!
+  \**************************************************/
 /*! no exports provided */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _ReactMount__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ReactMount */ "./packages/react-dom/src/client/ReactMount.js");
-/* harmony import */ var _ReactDefaultInjection__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../ReactDefaultInjection */ "./packages/react-dom/src/ReactDefaultInjection.js");
+/* harmony import */ var _ReactMount__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ReactMount */ "./version-one/react-dom/client/ReactMount.js");
 
-const { render } = _ReactMount__WEBPACK_IMPORTED_MODULE_0__["default"]
-
-
-
-_ReactDefaultInjection__WEBPACK_IMPORTED_MODULE_1__["default"].inject()
 
 const ReactDOM = {
-    render
+    render: _ReactMount__WEBPACK_IMPORTED_MODULE_0__["render"]
 }
 
 window.ReactDOM = ReactDOM
 
 /***/ }),
 
-/***/ "./packages/react-dom/src/client/ReactMount.js":
-/*!*****************************************************!*\
-  !*** ./packages/react-dom/src/client/ReactMount.js ***!
-  \*****************************************************/
-/*! exports provided: default */
+/***/ "./version-one/react-dom/client/ReactDOMComponentTree.js":
+/*!***************************************************************!*\
+  !*** ./version-one/react-dom/client/ReactDOMComponentTree.js ***!
+  \***************************************************************/
+/*! exports provided: getNodeFromInstance */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _react_src_ReactElement__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../react/src/ReactElement */ "./packages/react/src/ReactElement.js");
-/* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../constants */ "./packages/constants/index.js");
-/* harmony import */ var _react_reconciler_src_instantiateReactComponent__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../react-reconciler/src/instantiateReactComponent */ "./packages/react-reconciler/src/instantiateReactComponent.js");
-/* harmony import */ var _ReactDOMContainerInfo__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../ReactDOMContainerInfo */ "./packages/react-dom/src/ReactDOMContainerInfo.js");
-/* harmony import */ var _utils_setInnerHTML__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../../utils/setInnerHTML */ "./packages/utils/setInnerHTML.js");
-/* harmony import */ var _utils_DOMLazyTree__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../../utils/DOMLazyTree */ "./packages/utils/DOMLazyTree.js");
-/* harmony import */ var _react_reconciler_src_ReactReconciler__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../../react-reconciler/src/ReactReconciler */ "./packages/react-reconciler/src/ReactReconciler.js");
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getNodeFromInstance", function() { return getNodeFromInstance; });
+
+const getNodeFromInstance = (inst) => {
+    if (inst._nativeNode) {
+        return inst._nativeNode
+    }
+
+    let parents = []
+
+    while (!inst._nativeNode) {
+        parents.push(inst)
+
+        inst = inst._nativeParent
+    }
+
+    return inst._nativeNode
+}
+
+/***/ }),
+
+/***/ "./version-one/react-dom/client/ReactMount.js":
+/*!****************************************************!*\
+  !*** ./version-one/react-dom/client/ReactMount.js ***!
+  \****************************************************/
+/*! exports provided: render */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony import */ var _react_ReactElement__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../react/ReactElement */ "./version-one/react/ReactElement.js");
+/* harmony import */ var _TopLevelWrapper__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../TopLevelWrapper */ "./version-one/react-dom/TopLevelWrapper.js");
+/* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../constants */ "./version-one/constants/index.js");
+/* harmony import */ var _react_reconciler_instantiateReactComponent__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../react-reconciler/instantiateReactComponent */ "./version-one/react-reconciler/instantiateReactComponent.js");
+/* harmony import */ var _react_reconciler_ReactReconciler__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../react-reconciler/ReactReconciler */ "./version-one/react-reconciler/ReactReconciler.js");
+/* harmony import */ var _ReactDOMContainerInfo__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../ReactDOMContainerInfo */ "./version-one/react-dom/ReactDOMContainerInfo.js");
+/* harmony import */ var _utils_DOMLazyTree__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./utils/DOMLazyTree */ "./version-one/react-dom/client/utils/DOMLazyTree.js");
 
 
 
@@ -364,243 +554,388 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-let topLevelRootCounter = 1
+const render = function(nextElement, container, callback) {
+    return renderSubtreeIntoContainer(
+        null,
+        nextElement,
+        container,
+        callback,
+    )
+}
 
-function mountComponentIntoNode(
+const renderSubtreeIntoContainer = function(parentComponent, nextElement, container, callback) {
+
+    const nextWrappedElement = Object(_react_ReactElement__WEBPACK_IMPORTED_MODULE_0__["default"])(
+        _TopLevelWrapper__WEBPACK_IMPORTED_MODULE_1__["default"],
+        null,
+        null,
+        null,
+        nextElement
+    )
+
+    const component = renderNewRootComponent(
+        nextWrappedElement,
+        container,
+        parentComponent ? parentComponent._reactInternalInstance._processChildContext(
+            parentComponent._reactInternalInstance._context
+        ) : _constants__WEBPACK_IMPORTED_MODULE_2__["emptyObject"] 
+    )._renderedComponent.getPublicInstance()
+
+    if (callback) {
+
+    }
+
+    return component
+}
+
+const renderNewRootComponent = function(nextElement, container, context) {
+    const componentInstance = Object(_react_reconciler_instantiateReactComponent__WEBPACK_IMPORTED_MODULE_3__["default"])(nextElement)
+
+    mountComponentIntoNode(componentInstance, container, context)
+
+    return componentInstance
+}
+
+const mountComponentIntoNode = function(
     wrapperInstance,
     container,
     context
 ) {
-    const markup = _react_reconciler_src_ReactReconciler__WEBPACK_IMPORTED_MODULE_6__["default"].mountComponent(
+    const markup = _react_reconciler_ReactReconciler__WEBPACK_IMPORTED_MODULE_4__["default"].mountComponent(
         wrapperInstance,
+        { useCreateElement: true},
         null,
-        Object(_ReactDOMContainerInfo__WEBPACK_IMPORTED_MODULE_3__["default"])(wrapperInstance, container),
+        Object(_ReactDOMContainerInfo__WEBPACK_IMPORTED_MODULE_5__["default"])(wrapperInstance, container),
         context
     )
 
     wrapperInstance._renderedComponent._topLevelWrapper = wrapperInstance
 
-    ReactMount._mountImageIntoNode(
+    mountImageIntoNode(
         markup,
         container,
         wrapperInstance
     )
 }
 
-function batchedMountComponentIntoNode (
-    componentInstance,
+const mountImageIntoNode = function(
+    markup,
     container,
-    context
-) {
-    mountComponentIntoNode(
-        componentInstance,
-        container,
-        context
-    )
-}
-
-const TopLevelWrapper = function() {
-    this.rootID = topLevelRootCounter++
-};
-
-TopLevelWrapper.prototype.isReactComponent = {};
-
-TopLevelWrapper.prototype.render = function() {
-  // this.props is actually a ReactElement
-  return this.props;
-}
-
-const ReactMount = {
-    _renderNewRootComponent: function(nextElement, container, context) {
-        const componentInstance = Object(_react_reconciler_src_instantiateReactComponent__WEBPACK_IMPORTED_MODULE_2__["default"])(nextElement)
-
-        batchedMountComponentIntoNode(componentInstance, container, context)
-
-        return componentInstance
-    },
-    _mountImageIntoNode: function(
-        markup,
-        container,
-        wrapperInstance,
-        transaction = { useCreateElement : true}
-    ){
-        if (transaction.useCreateElement) {
-            while (container.lastChild) {
-                container.removeChild(container.lastChild)
-            }
-            _utils_DOMLazyTree__WEBPACK_IMPORTED_MODULE_5__["default"].insertTreeBefore(container, markup, null)
-        } else {
-            Object(_utils_setInnerHTML__WEBPACK_IMPORTED_MODULE_4__["default"])(container, markup)
+    wrapperInstance,
+    transaction = { useCreateElement : true}
+){
+    if (transaction.useCreateElement) {
+        while (container.lastChild) {
+            container.removeChild(container.lastChild)
         }
-    },
-    _renderSubtreeIntoContainer: function(parentComponent, nextElement, container, callback) {
-
-        const nextWrappedElement = Object(_react_src_ReactElement__WEBPACK_IMPORTED_MODULE_0__["default"])(
-            TopLevelWrapper,
-            null,
-            null,
-            nextElement
-        )
-
-        const component = ReactMount._renderNewRootComponent(
-            nextWrappedElement,
-            container,
-            parentComponent ? parentComponent._reactInternalInstance._processChildContext(
-                parentComponent._reactInternalInstance._context
-            ) : _constants__WEBPACK_IMPORTED_MODULE_1__["emptyObject"] // {}
-        )._renderedComponent.getPublicInstance()
-
-        if (callback) {
-
-        }
-
-        return component
-    },
-    render: function(nextElement, container, callback) {
-        return ReactMount._renderSubtreeIntoContainer(
-            null,
-            nextElement,
-            container,
-            callback,
-        )
+        _utils_DOMLazyTree__WEBPACK_IMPORTED_MODULE_6__["default"].insertTreeBefore(container, markup, null)
+    } else {
+        setInnerHTML(container, markup)
     }
 }
 
-/* harmony default export */ __webpack_exports__["default"] = (ReactMount);
-
 /***/ }),
 
-/***/ "./packages/react-reconciler/src/ReactCompositeComponent.js":
-/*!******************************************************************!*\
-  !*** ./packages/react-reconciler/src/ReactCompositeComponent.js ***!
-  \******************************************************************/
+/***/ "./version-one/react-dom/client/utils/DOMLazyTree.js":
+/*!***********************************************************!*\
+  !*** ./version-one/react-dom/client/utils/DOMLazyTree.js ***!
+  \***********************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _ReactInstanceMap__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ReactInstanceMap */ "./packages/react-reconciler/src/ReactInstanceMap.js");
-/* harmony import */ var _ReactReconciler__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ReactReconciler */ "./packages/react-reconciler/src/ReactReconciler.js");
+/* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../constants */ "./version-one/constants/index.js");
+/* harmony import */ var _constants_nodeTypes__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../constants/nodeTypes */ "./version-one/constants/nodeTypes.js");
+/* harmony import */ var _setTextContent__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./setTextContent */ "./version-one/react-dom/client/utils/setTextContent.js");
 
 
 
-function StatelessComponent(Component) {}
 
-StatelessComponent.prototype.render = function() {
-    const Component = _ReactInstanceMap__WEBPACK_IMPORTED_MODULE_0__["default"].get(this)._currentElement.type
-    const element = Component(this.props)
-    return element
+function DOMLazyTree(node) {
+    return {
+      node: node,
+      children: [],
+      html: null,
+      text: null,
+    }
 }
 
-const ReactCompositeComponentMixin = {
-    construct: function(element) {
+DOMLazyTree.queueText = function(tree, text) {
+  if (_constants__WEBPACK_IMPORTED_MODULE_0__["enableLazy"]) {
+    tree.text = text;
+  } else {
+    Object(_setTextContent__WEBPACK_IMPORTED_MODULE_2__["default"])(tree.node, text);
+  }
+}
+
+DOMLazyTree.insertTreeBefore = function(parentNode, tree, referenceNode) {
+  if (tree.node.nodeType === _constants_nodeTypes__WEBPACK_IMPORTED_MODULE_1__["DOCUMENTFRAGMENT_NODE_TYPE"]) {
+      insertTreeChildren(tree)
+      parentNode.insertBefore(tree.node, referenceNode)
+  } else {
+      parentNode.insertBefore(tree.node, referenceNode)
+      insertTreeChildren(tree)
+  }
+}
+
+function insertTreeChildren(tree) {
+  if (!_constants__WEBPACK_IMPORTED_MODULE_0__["enableLazy"]) {
+      return 
+  }
+  const node = tree.node
+  const children = tree.children
+  if (children.length) {
+      for (var i = 0; i < children.length; i++) {
+        DOMLazyTree.insertTreeBefore(node, children[i], null);
+      }
+  } else if (tree.html !== null) {
+      node.innerHTML = tree.html
+  } else if (tree.text !== null) {
+      Object(_setTextContent__WEBPACK_IMPORTED_MODULE_2__["default"])(node, tree.text)
+  }
+}
+
+DOMLazyTree.queueChild = function(parentTree, childTree) {
+  if (_constants__WEBPACK_IMPORTED_MODULE_0__["enableLazy"]) {
+    parentTree.children.push(childTree);
+  } else {
+    parentTree.node.appendChild(childTree.node);
+  }
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (DOMLazyTree);
+
+/***/ }),
+
+/***/ "./version-one/react-dom/client/utils/setTextContent.js":
+/*!**************************************************************!*\
+  !*** ./version-one/react-dom/client/utils/setTextContent.js ***!
+  \**************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+const setTextContent = function(node, text) {
+    node.textContent = text
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (setTextContent);
+
+/***/ }),
+
+/***/ "./version-one/react-reconciler/ReactCompositeComponent.js":
+/*!*****************************************************************!*\
+  !*** ./version-one/react-reconciler/ReactCompositeComponent.js ***!
+  \*****************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ReactCompositeComponent; });
+/* harmony import */ var _StatelessComponent__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./StatelessComponent */ "./version-one/react-reconciler/StatelessComponent.js");
+/* harmony import */ var _ReactInstanceMap__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ReactInstanceMap */ "./version-one/react-reconciler/ReactInstanceMap.js");
+/* harmony import */ var _ReactReconciler__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ReactReconciler */ "./version-one/react-reconciler/ReactReconciler.js");
+
+
+
+
+class ReactCompositeComponent {
+    constructor(element) {
         this._currentElement = element
+        // for diff
+        this._rootNodeID = null
+        this._instance = null
+        // for update
         this._renderedComponent = null
-    },
-    mountComponent: function(
+        this._context = null
+        // for dom tree
+        this._nativeParent = null;
+        this._nativeContainerInfo = null
+    }
+
+    _processProps(newProps) {
+        return newProps
+    }
+
+    _processContext(context) {
+        return this._maskContext(context)
+    }
+    /**
+     * 绑定上下文
+     * @param {上下文} context 
+     */
+    _maskContext(context) {
+        const Component = this._currentElement.type
+        const contextTypes = Component.contextTypes
+        if (contextTypes) {
+            const maskedContext = {}
+
+            for (let contextName in contextTypes) {
+                maskedContext[contextName] = context[contextName]
+            }
+
+            return maskedContext
+        }
+        return {}
+    }
+    /**
+     * 绑定组件
+     * @param {*} transaction 
+     * @param {*} nativeParent 
+     * @param {*} nativeContainerInfo 
+     * @param {*} context 
+     */
+    mountComponent(
+        transaction,
         nativeParent,
         nativeContainerInfo,
         context
     ) {
+        this.context = context
         this._nativeParent = nativeParent
         this._nativeContainerInfo = nativeContainerInfo
-        
-        const publicProps = this._processProps(this._currentElement.props)
+
+        const publicProps = this._processProps(this._currentElement.props) //
+        const publicContext = this._processContext(context) //
 
         const Component = this._currentElement.type
 
         let inst
+        // 存储render返回的数据
         let renderedElement
 
+        // 判断是否为继承React.Component类的组件
         if (Component.prototype && Component.prototype.isReactComponent) {
-            inst = new Component(publicProps)
+            inst = new Component(publicProps, publicContext, null)
         } else {
-            inst = Component(publicProps)
-        }
+            // 默认为function组件
+            inst = Component(publicProps, publicContext, null)
 
-        if (inst == null || inst.render == null) {
-            renderedElement = inst
-            inst = new StatelessComponent(Component)
+            if (inst === null || inst.render == null) {
+                renderedElement = inst
+                // 无状态组件
+                inst = new _StatelessComponent__WEBPACK_IMPORTED_MODULE_0__["default"](Component) 
+            }
+
         }
 
         inst.props = publicProps
+        inst.context = context
+        inst.refs = {}
 
         this._instance = inst
 
-        _ReactInstanceMap__WEBPACK_IMPORTED_MODULE_0__["default"].set(inst, this)
+        // 存储实例
+        _ReactInstanceMap__WEBPACK_IMPORTED_MODULE_1__["default"].set(inst, this)
 
-        let markup
+        // State部分
 
-        if (inst.unstable_handleError) {
+        // markup
 
-        } else {
-            markup = this.performInitialMount(renderedElement, nativeParent, nativeContainerInfo)
-        }
+        let markup 
+        
+        // 执行render
+        markup = this.performInitialMount(renderedElement, nativeParent, nativeContainerInfo, transaction, context)
 
+        // 钩子函数
         if (inst.componentDidMount) {
-
+            
         }
 
         return markup
-    },
-    _processProps: function(newProps) {
-        return newProps
-    },
-    performInitialMount: function(
-        renderedElement,
-        nativeParent, 
-        nativeContainerInfo
-    ) {
+    } 
+
+    performInitialMount(renderedElement, nativeParent, nativeContainerInfo, transaction, context) {
         const inst = this._instance
-    
+        
         if (inst.componentWillMount) {
-            inst.componentWillMount()
+
         }
-        // If not a stateless component, we now render
+
         if (renderedElement === undefined) {
             renderedElement = this._renderValidatedComponent()
         }
-    
-        this._renderedComponent = this._instantiateReactComponent(renderedElement)
-    
-        const markup = _ReactReconciler__WEBPACK_IMPORTED_MODULE_1__["default"].mountComponent(
-            this._renderedComponent,
-            nativeParent,
-            nativeContainerInfo
+
+        this._renderedComponent = this._instantiateReactComponent(
+            renderedElement
         )
-      
+
+        const markup = _ReactReconciler__WEBPACK_IMPORTED_MODULE_2__["default"].mountComponent(
+            this._renderedComponent,
+            transaction,
+            nativeParent,
+            nativeContainerInfo,
+            this._processChildContext(context)
+        )
+
         return markup
-    },
-    _instantiateReactComponent: null,
-    _renderValidatedComponent: function() {
-        let renderedComponent
-    
-        try {
-            renderedComponent = this._renderValidatedComponentWithoutOwnerOrContext()
-        } finally {
-            return renderedComponent
-        }
-    },
-    _renderValidatedComponentWithoutOwnerOrContext: function() {
+    }
+
+    _renderValidatedComponent() {
+        return this._renderValidatedComponentWithoutOwnerOrContext()
+    }
+
+    _renderValidatedComponentWithoutOwnerOrContext() {
         const inst = this._instance;
         const renderedComponent = inst.render()
-    
         return renderedComponent
+    }
+    /**
+     * 后面讲解
+     * @param {*} context 
+     */
+    _processChildContext(currentContext) {
+        const Component = this._currentElement.type
+        const inst = this._instance
+        const childContext = inst.getChildContext && inst.getChildContext()
+
+        if (childContext) {
+            return Object.assign({}, currentContext, childContext)
+        }
+
+        return currentContext
+    }
+
+    getPublicInstance() {
+        var inst = this._instance
+        if (inst instanceof _StatelessComponent__WEBPACK_IMPORTED_MODULE_0__["default"]) {
+          return null
+        }
+        return inst
     }
 }
 
-const ReactCompositeComponent = {
-    Mixin: ReactCompositeComponentMixin
+/***/ }),
+
+/***/ "./version-one/react-reconciler/ReactEmptyComponent.js":
+/*!*************************************************************!*\
+  !*** ./version-one/react-reconciler/ReactEmptyComponent.js ***!
+  \*************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _react_dom_ReactDOMEmptyComponent__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../react-dom/ReactDOMEmptyComponent */ "./version-one/react-dom/ReactDOMEmptyComponent.js");
+
+
+const ReactEmptyComponent = {
+    create: function(instantiate) {
+        return new _react_dom_ReactDOMEmptyComponent__WEBPACK_IMPORTED_MODULE_0__["default"](instantiate)
+    }
 }
 
-/* harmony default export */ __webpack_exports__["default"] = (ReactCompositeComponent);
+/* harmony default export */ __webpack_exports__["default"] = (ReactEmptyComponent);
 
 /***/ }),
 
-/***/ "./packages/react-reconciler/src/ReactInstanceMap.js":
-/*!***********************************************************!*\
-  !*** ./packages/react-reconciler/src/ReactInstanceMap.js ***!
-  \***********************************************************/
+/***/ "./version-one/react-reconciler/ReactInstanceMap.js":
+/*!**********************************************************!*\
+  !*** ./version-one/react-reconciler/ReactInstanceMap.js ***!
+  \**********************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -619,49 +954,64 @@ const ReactInstanceMap = {
 
 /***/ }),
 
-/***/ "./packages/react-reconciler/src/ReactNativeComponent.js":
-/*!***************************************************************!*\
-  !*** ./packages/react-reconciler/src/ReactNativeComponent.js ***!
-  \***************************************************************/
+/***/ "./version-one/react-reconciler/ReactMultiChild.js":
+/*!*********************************************************!*\
+  !*** ./version-one/react-reconciler/ReactMultiChild.js ***!
+  \*********************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-let genericComponentClass = null
-let textComponentClass = null
-
-const ReactHostComponentInjection = {
-    injectGenericComponentClass: function(componentClass) {
-        genericComponentClass = componentClass;
+const ReactMultiChild = {
+    mountChildren: function(nestedChildren, transaction, context) {
+        
     },
-    injectTextComponentClass: function(componentClass) {
-        textComponentClass = componentClass;
+    _reconcilerInstantiateChildren: function(nestedChildren, transaction, context) {
+
     }
 }
 
+/* harmony default export */ __webpack_exports__["default"] = (ReactMultiChild);
+
+/***/ }),
+
+/***/ "./version-one/react-reconciler/ReactNativeComponent.js":
+/*!**************************************************************!*\
+  !*** ./version-one/react-reconciler/ReactNativeComponent.js ***!
+  \**************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _react_dom_ReactDOMComponent__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../react-dom/ReactDOMComponent */ "./version-one/react-dom/ReactDOMComponent.js");
+/* harmony import */ var _react_dom_ReactDOMTextComponent__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../react-dom/ReactDOMTextComponent */ "./version-one/react-dom/ReactDOMTextComponent.js");
+/* harmony import */ var _react_dom_ReactDOMTextComponent__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_react_dom_ReactDOMTextComponent__WEBPACK_IMPORTED_MODULE_1__);
+
+
+
 function createInternalComponent(element) {
-    return new genericComponentClass(element)
+    return new _react_dom_ReactDOMComponent__WEBPACK_IMPORTED_MODULE_0__["default"](element)
 }
 
 function createInstanceForText(node) {
-    return new textComponentClass(text)
+    return new _react_dom_ReactDOMTextComponent__WEBPACK_IMPORTED_MODULE_1___default.a(text)
 }
 
 const ReactNativeComponent = {
     createInternalComponent,
-    createInstanceForText,
-    injection: ReactHostComponentInjection
+    createInstanceForText
 }
 
 /* harmony default export */ __webpack_exports__["default"] = (ReactNativeComponent);
 
 /***/ }),
 
-/***/ "./packages/react-reconciler/src/ReactReconciler.js":
-/*!**********************************************************!*\
-  !*** ./packages/react-reconciler/src/ReactReconciler.js ***!
-  \**********************************************************/
+/***/ "./version-one/react-reconciler/ReactReconciler.js":
+/*!*********************************************************!*\
+  !*** ./version-one/react-reconciler/ReactReconciler.js ***!
+  \*********************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -670,11 +1020,13 @@ __webpack_require__.r(__webpack_exports__);
 const ReactReconciler = {
     mountComponent: function (
         internalInstance,
+        transaction = { useCreateElement: true },
         nativeParent,
         nativeContainerInfo,
         context
     ) {
         const markup = internalInstance.mountComponent(
+            transaction,
             nativeParent,
             nativeContainerInfo,
             context
@@ -691,59 +1043,74 @@ const ReactReconciler = {
 
 /***/ }),
 
-/***/ "./packages/react-reconciler/src/instantiateReactComponent.js":
-/*!********************************************************************!*\
-  !*** ./packages/react-reconciler/src/instantiateReactComponent.js ***!
-  \********************************************************************/
+/***/ "./version-one/react-reconciler/StatelessComponent.js":
+/*!************************************************************!*\
+  !*** ./version-one/react-reconciler/StatelessComponent.js ***!
+  \************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _ReactNativeComponent__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ReactNativeComponent */ "./packages/react-reconciler/src/ReactNativeComponent.js");
-/* harmony import */ var _ReactCompositeComponent__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ReactCompositeComponent */ "./packages/react-reconciler/src/ReactCompositeComponent.js");
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return StatelessComponent; });
+/* harmony import */ var _ReactInstanceMap__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ReactInstanceMap */ "./version-one/react-reconciler/ReactInstanceMap.js");
 
 
+class StatelessComponent {
+    constructor(Component) {
 
-const ReactCompositeComponentWrapper = function(element) {
-    this.construct(element);
-}
-
-Object.assign(
-    ReactCompositeComponentWrapper.prototype,
-    _ReactCompositeComponent__WEBPACK_IMPORTED_MODULE_1__["default"].Mixin,
-    {
-      _instantiateReactComponent: instantiateReactComponent,
     }
-)
 
-function isInternalComponentType(type) {
-    return (
-        typeof type === 'function' &&
-        typeof type.prototype !== 'undefined' &&
-        typeof type.prototype.mountComponent === 'function' &&
-        typeof type.prototype.receiveComponent === 'function'
-      )
+    render() {
+        var Component = _ReactInstanceMap__WEBPACK_IMPORTED_MODULE_0__["default"].get(this)._currentElement.type
+        var element = Component(this.props, this.context, this.updater)
+        return element
+    }
 }
 
+/***/ }),
+
+/***/ "./version-one/react-reconciler/instantiateReactComponent.js":
+/*!*******************************************************************!*\
+  !*** ./version-one/react-reconciler/instantiateReactComponent.js ***!
+  \*******************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _ReactEmptyComponent__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ReactEmptyComponent */ "./version-one/react-reconciler/ReactEmptyComponent.js");
+/* harmony import */ var _ReactNativeComponent__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ReactNativeComponent */ "./version-one/react-reconciler/ReactNativeComponent.js");
+/* harmony import */ var _ReactCompositeComponent__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ReactCompositeComponent */ "./version-one/react-reconciler/ReactCompositeComponent.js");
+
+
+
+
+class ReactCompositeComponentWrapper extends _ReactCompositeComponent__WEBPACK_IMPORTED_MODULE_2__["default"] {
+    constructor(element) {
+        super(element)
+        this._instantiateReactComponent = instantiateReactComponent
+    }
+}
+
+// 组件入口
+// 判断node类型来区分不同组件
 function instantiateReactComponent(node) {
-    let instance 
+    let instance
 
-    if (node === null || node === false) {
-
+    if (node === null) {
+        instance = _ReactEmptyComponent__WEBPACK_IMPORTED_MODULE_0__["default"].create(instantiateReactComponent) // 初始化ReactDOMEmptyComponent 空组件
     } else if (typeof node === 'object') {
-        const type = node.type
-        const element = node
-        if (typeof type === 'string') {
-            instance = _ReactNativeComponent__WEBPACK_IMPORTED_MODULE_0__["default"].createInternalComponent(element)
-        } else if (isInternalComponentType(type)) {
-            instance = new type(element)
+        const element = node // 这里我们将节点称为元素
+
+        if (typeof element.type === 'string') {
+            instance = _ReactNativeComponent__WEBPACK_IMPORTED_MODULE_1__["default"].createInternalComponent(element) // 初始化ReactDOMComponent DOM标签组件
         } else {
-            instance = new ReactCompositeComponentWrapper(element)
+            instance = new ReactCompositeComponentWrapper(element) // 初始化ReactCompositeComponent 自定义标签组件 
         }
     } else if (typeof node === 'string' || typeof node === 'number') {
-        instance = _ReactNativeComponent__WEBPACK_IMPORTED_MODULE_0__["default"].createInstanceForText(node)
-    }
+        instance = _ReactNativeComponent__WEBPACK_IMPORTED_MODULE_1__["default"].createInstanceForText(node) // 初始化ReactDOMTextComponent 文本组件
+    } 
 
     return instance
 }
@@ -752,16 +1119,16 @@ function instantiateReactComponent(node) {
 
 /***/ }),
 
-/***/ "./packages/react/src/ReactElement.js":
-/*!********************************************!*\
-  !*** ./packages/react/src/ReactElement.js ***!
-  \********************************************/
+/***/ "./version-one/react/ReactElement.js":
+/*!*******************************************!*\
+  !*** ./version-one/react/ReactElement.js ***!
+  \*******************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-const ReactElement = function(type, key, ref, props) {
+const ReactElement = function(type, key, ref, self, props) {
     const element = {
         type: type,
         key: key,
@@ -778,7 +1145,8 @@ ReactElement.createElement = function(type, config, children) {
 
     let key = null
     let ref = null
-    
+    let self = null
+
     if (config) {
 
     } 
@@ -793,109 +1161,12 @@ ReactElement.createElement = function(type, config, children) {
         type,
         key,
         ref,
+        self,
         props,
     )
 }
 
 /* harmony default export */ __webpack_exports__["default"] = (ReactElement);
-
-/***/ }),
-
-/***/ "./packages/utils/DOMLazyTree.js":
-/*!***************************************!*\
-  !*** ./packages/utils/DOMLazyTree.js ***!
-  \***************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _constants_NodeType__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../constants/NodeType */ "./packages/constants/NodeType.js");
-/* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../constants */ "./packages/constants/index.js");
-/* harmony import */ var _setTextContent__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./setTextContent */ "./packages/utils/setTextContent.js");
-
-
-
-
-function insertTreeChildren(tree) {
-    if (!_constants__WEBPACK_IMPORTED_MODULE_1__["canUseLazy"]) {
-        return 
-    }
-    const node = tree.node
-    const children = tree.children
-    if (children.length) {
-        for (var i = 0; i < children.length; i++) {
-            insertTreeBefore(node, children[i], null);
-        }
-    } else if (tree.html !== null) {
-        node.innerHTML = tree.html
-    } else if (tree.text !== null) {
-        Object(_setTextContent__WEBPACK_IMPORTED_MODULE_2__["default"])(node, tree.text)
-    }
-}
-
-function DOMLazyTree(node) {
-    return {
-      node: node,
-      children: [],
-      html: null,
-      text: null,
-    }
-}
-
-DOMLazyTree.insertTreeBefore = function(parentNode, tree, referenceNode) {
-    if (tree.node.nodeType === _constants_NodeType__WEBPACK_IMPORTED_MODULE_0__["DOCUMENTFRAGMENT_NODE_TYPE"]) {
-        insertTreeChildren(tree)
-        parentNode.insertBefore(tree.node, referenceNode)
-    } else {
-        parentNode.insertBefore(tree.node, referenceNode)
-        insertTreeChildren(tree)
-    }
-}
-
-DOMLazyTree.queueText = function(tree, text) {
-    if (enableLazy) {
-        tree.text = text;
-    } else {
-        Object(_setTextContent__WEBPACK_IMPORTED_MODULE_2__["default"])(tree.node, text);
-    }
-}
-
-/* harmony default export */ __webpack_exports__["default"] = (DOMLazyTree);
-
-/***/ }),
-
-/***/ "./packages/utils/setInnerHTML.js":
-/*!****************************************!*\
-  !*** ./packages/utils/setInnerHTML.js ***!
-  \****************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-const setInnerHTML = function(node, html) {
-    node.innerHTML = html
-}
-
-/* harmony default export */ __webpack_exports__["default"] = (setInnerHTML);
-
-/***/ }),
-
-/***/ "./packages/utils/setTextContent.js":
-/*!******************************************!*\
-  !*** ./packages/utils/setTextContent.js ***!
-  \******************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-const setTextContent = function(node, text) {
-    node.textContent = text
-}
-
-/* harmony default export */ __webpack_exports__["default"] = (setTextContent);
 
 /***/ })
 
