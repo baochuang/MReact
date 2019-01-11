@@ -9,8 +9,8 @@ function flushBatchedUpdates() {
 }
 
 const ReactUpdatesInjection = {
-    injectReconcileTransaction: function(ReconcileTransaction) {
-        ReactUpdates.ReactReconcileTransaction = ReconcileTransaction
+    injectReconcileTransaction: function(ReconcilerTransaction) {
+        ReactUpdates.ReactReconcilerTransaction = ReconcilerTransaction
     },
     injectBatchingStrategy: function(_batchingStrategy) {
         batchingStrategy = _batchingStrategy
@@ -18,7 +18,7 @@ const ReactUpdatesInjection = {
 }
 
 const ReactUpdates = {
-    ReactReconcileTransaction: null,
+    ReactReconcilerTransaction: null,
     injection: ReactUpdatesInjection,
     batchedUpdates,
     flushBatchedUpdates

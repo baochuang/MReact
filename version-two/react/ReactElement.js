@@ -1,3 +1,5 @@
+import ReactCurrentOwner from './ReactCurrentOwner'
+
 const REACT_ELEMENT_TYPE = (typeof Symbol === 'function' && Symbol.for && Symbol.for('react.element')) || 0xeac7
 
 const RESERVED_PROPS = {
@@ -5,13 +7,17 @@ const RESERVED_PROPS = {
     ref: true
 }
 
-const ReactElement = function(type, key, ref, self, props) {
+const ReactElement = function(type, key, ref, self, owner, props) {
     const element = {
         $$typeof: REACT_ELEMENT_TYPE,
         type: type,
         key: key,
+        _self: self,
         ref: ref,
         props: props,
+
+        // 在attachRef的时候用到
+        _owner: owner
     }
     return element
 }
@@ -45,11 +51,22 @@ ReactElement.createElement = function(type, config, children) {
         props.children = childArray
     }
     
+      // Resolve default props
+    if (type && type.defaultProps) {
+        const defaultProps = type.defaultProps
+        for (propName in defaultProps) {
+            if (props[propName] === undefined) {
+                props[propName] = defaultProps[propName]
+            }
+        }
+    }
+
     return ReactElement(
         type,
         key,
         ref,
         self,
+        ReactCurrentOwner.current,
         props,
     )
 }

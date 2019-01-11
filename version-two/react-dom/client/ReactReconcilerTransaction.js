@@ -26,10 +26,10 @@ const EVENT_SUPPRESSION = {
 
 const ON_DOM_READY_QUEUEING = {
     initialize: function() {
-
+        this.reactMountReady.reset()
     },
     close: function() {
-
+        this.reactMountReady.notifyAll()
     }
 }
 
@@ -47,6 +47,11 @@ export default class ReactReconcilerTransaction extends Transaction {
         this.getReactMountReady = getReactMountReady
         this.reactMountReady = CallbackQueue.getPooled(null)
         this.useCreateElement = useCreateElement;
+    }
+
+    destructor() {
+        CallbackQueue.release(this.reactMountReady)
+        this.reactMountReady = null
     }
 }
 

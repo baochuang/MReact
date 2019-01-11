@@ -1,6 +1,8 @@
 import StatelessComponent from './StatelessComponent'
 import ReactInstanceMap from './ReactInstanceMap'
 import ReactReconciler from './ReactReconciler'
+import { emptyObject } from '../constants'
+import ReactCurrentOwner from '../react/ReactCurrentOwner'
 
 export default class ReactCompositeComponent {
     constructor(element) {
@@ -69,7 +71,13 @@ export default class ReactCompositeComponent {
 
         // 判断是否为继承React.Component类的组件
         if (Component.prototype && Component.prototype.isReactComponent) {
-            inst = new Component(publicProps, publicContext, null)
+            ReactCurrentOwner.current = this
+            try {
+                inst = new Component(publicProps, publicContext, null)
+            } finally {
+                ReactCurrentOwner.current = null
+            }
+            
         } else {
             // 默认为function组件
             inst = Component(publicProps, publicContext, null)
@@ -102,7 +110,7 @@ export default class ReactCompositeComponent {
 
         // 钩子函数
         if (inst.componentDidMount) {
-            
+            transaction.getReactMountReady().enqueue(inst.componentDidMount, inst)
         }
 
         return markup
@@ -135,7 +143,14 @@ export default class ReactCompositeComponent {
     }
 
     _renderValidatedComponent() {
-        return this._renderValidatedComponentWithoutOwnerOrContext()
+        let renderedComponent
+        ReactCurrentOwner.current = this
+        try {
+            renderedComponent = this._renderValidatedComponentWithoutOwnerOrContext()
+        } finally {
+            ReactCurrentOwner.current = null
+        }
+        return renderedComponent
     }
 
     _renderValidatedComponentWithoutOwnerOrContext() {
@@ -157,6 +172,13 @@ export default class ReactCompositeComponent {
         }
 
         return currentContext
+    }
+
+    attachRef(ref, component) {
+        const inst = this.getPublicInstance();
+        const publicComponentInstance = component.getPublicInstance();
+        const refs = inst.refs === emptyObject ? (inst.refs = {}) : inst.refs;
+        refs[ref] = publicComponentInstance;
     }
 
     getPublicInstance() {

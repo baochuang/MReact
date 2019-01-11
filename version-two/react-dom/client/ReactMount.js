@@ -24,6 +24,7 @@ const renderSubtreeIntoContainer = function(parentComponent, nextElement, contai
         null,
         null,
         null,
+        null,
         nextElement
     )
 
@@ -62,9 +63,10 @@ const batchedMountComponentIntoNode = function(
     container,
     context
 ) {
-    const transaction = ReactUpdates.ReactReconcileTransaction.getPooled(
+    const transaction = ReactUpdates.ReactReconcilerTransaction.getPooled(
         ReactDOMFeatureFlags.useCreateElement
     )
+    // 执行绑定并将生命周期钩子放入队列
     transaction.perform(
         mountComponentIntoNode,
         componentInstance,
@@ -72,6 +74,8 @@ const batchedMountComponentIntoNode = function(
         transaction,
         context
     )
+    // 执行事务队列
+    ReactUpdates.ReactReconcilerTransaction.release(transaction)
 }
 
 const mountComponentIntoNode = function(
@@ -93,7 +97,8 @@ const mountComponentIntoNode = function(
     mountImageIntoNode(
         markup,
         container,
-        wrapperInstance
+        wrapperInstance,
+        transaction
     )
 }
 
