@@ -1,9 +1,14 @@
 
 class App extends React.Component {
+    componentDidMount() {
+        console.log(this.refs.container)
+    }
     render() {
         const { text } = this.props
         return <div>
-            <h1>{text}</h1>
+            <div ref='container'>
+                <h1>Container</h1>
+            </div>
             <h5>{text}</h5>
         </div>
     }
