@@ -20,7 +20,9 @@ ReactElement.createElement = function(type, config, children) {
     let self = null
 
     if (config) {
-
+        for (let propName in config) {
+            props[propName] = config[propName]
+        }
     } 
 
     const childrenLength = arguments.length - 2
