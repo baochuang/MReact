@@ -26,8 +26,15 @@ ReactElement.createElement = function(type, config, children) {
     } 
 
     const childrenLength = arguments.length - 2
+
     if (childrenLength === 1) {
         props.children = children
+    } else if (childrenLength > 1) {
+        const childArray = Array(childrenLength);
+        for (var i = 0; i < childrenLength; i++) {
+            childArray[i] = arguments[i + 2]
+        }
+        props.children = childArray
     }
     
     return ReactElement(

@@ -1,4 +1,3 @@
-// 抄的 还没搞清楚
 import ReactElement from '../react/ReactElement'
 
 const SEPARATOR = '.'
@@ -18,6 +17,13 @@ function traverseAllChildren(children, callback, traverseContext) {
     return traverseAllChildrenImpl(children, '', callback, traverseContext);
 }
 
+/**
+ * 获取children对象将其转换为key-value对象
+ * @param {*} children 
+ * @param {*} nameSoFar 
+ * @param {*} callback 
+ * @param {*} traverseContext 
+ */
 function traverseAllChildrenImpl(
     children,
     nameSoFar,
@@ -26,12 +32,32 @@ function traverseAllChildrenImpl(
 ) {
     const type = typeof children
 
+    // 单个节点处理
     if (children === null || type === 'string' || type === 'number' || ReactElement.isValidElement(children)) {
         callback(traverseContext, children,
         // If it's the only child, treat the name as if it was wrapped in an array
         // so that it's consistent if the number of children grows.
         nameSoFar === '' ? SEPARATOR + getComponentKey(children, 0) : nameSoFar)
         return 1
+    } 
+
+    let child
+    let nextName
+    let subtreeCount = 0
+    const nextNamePrefix = nameSoFar === '' ? SEPARATOR : nameSoFar + SUBSEPARATOR
+
+    // 多个兄弟节点处理
+    if (Array.isArray(children)) {
+        for (let i = 0; i < children.length; i++) {
+            child = children[i]
+            nextName = nextNamePrefix + getComponentKey(child, i);
+            subtreeCount += traverseAllChildrenImpl(
+              child,
+              nextName,
+              callback,
+              traverseContext
+            );
+          }
     }
 }
 

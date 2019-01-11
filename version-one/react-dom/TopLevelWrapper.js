@@ -7,7 +7,6 @@ const TopLevelWrapper = function() {
 TopLevelWrapper.prototype.isReactComponent = {}
 
 TopLevelWrapper.prototype.render = function() {
-    console.log(this)
     return this.props
 }
 

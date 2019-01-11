@@ -3,6 +3,7 @@ class App extends React.Component {
     render() {
         const { text } = this.props
         return <div>
+            <h1>{text}</h1>
             <h5>{text}</h5>
         </div>
     }

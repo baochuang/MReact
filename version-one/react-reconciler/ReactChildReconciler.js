@@ -16,6 +16,7 @@ const ReactChildReconciler = {
         }
         var childInstances = {}
         traverseAllChildren(nestedChildNodes, instantiateChild, childInstances)
+        // 返回一个对象，key为自动生成
         return childInstances
     }
 }
