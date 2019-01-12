@@ -4,7 +4,7 @@
     "scripts": {
         "webpack": "webpack",
         "babel": "babel examples/src/index.js --out-dir examples/lib",
-        "test": "webpack & babel examples/src/index.js --out-dir examples/lib"
+        "build": "webpack & babel examples/src/index.js --out-dir examples/lib"
     },
     "dependencies": {
         "react": "15.0.0",

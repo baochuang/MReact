@@ -1,5 +1,3 @@
-import ReactCurrentOwner from './ReactCurrentOwner'
-
 const REACT_ELEMENT_TYPE = (typeof Symbol === 'function' && Symbol.for && Symbol.for('react.element')) || 0xeac7
 
 const RESERVED_PROPS = {
@@ -60,13 +58,13 @@ ReactElement.createElement = function(type, config, children) {
             }
         }
     }
-
+    
     return ReactElement(
         type,
         key,
         ref,
         self,
-        ReactCurrentOwner.current,
+        Share.ReactCurrentOwner.current,
         props,
     )
 }

@@ -2,7 +2,6 @@ import StatelessComponent from './StatelessComponent'
 import ReactInstanceMap from './ReactInstanceMap'
 import ReactReconciler from './ReactReconciler'
 import { emptyObject } from '../constants'
-import ReactCurrentOwner from '../react/ReactCurrentOwner'
 
 export default class ReactCompositeComponent {
     constructor(element) {
@@ -71,11 +70,11 @@ export default class ReactCompositeComponent {
 
         // 判断是否为继承React.Component类的组件
         if (Component.prototype && Component.prototype.isReactComponent) {
-            ReactCurrentOwner.current = this
+            Share.ReactCurrentOwner.current = this
             try {
                 inst = new Component(publicProps, publicContext, null)
             } finally {
-                ReactCurrentOwner.current = null
+                Share.ReactCurrentOwner.current = null
             }
             
         } else {
@@ -144,11 +143,11 @@ export default class ReactCompositeComponent {
 
     _renderValidatedComponent() {
         let renderedComponent
-        ReactCurrentOwner.current = this
+        Share.ReactCurrentOwner.current = this
         try {
             renderedComponent = this._renderValidatedComponentWithoutOwnerOrContext()
         } finally {
-            ReactCurrentOwner.current = null
+            Share.ReactCurrentOwner.current = null
         }
         return renderedComponent
     }
