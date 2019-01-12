@@ -3,7 +3,7 @@ import DOMNamespaces from './DOMNamespaces'
 import DOMPropertyOperations from './DOMPropertyOperations'
 import DOMLazyTree from './client/utils/DOMLazyTree'
 
-import { getNodeFromInstance } from './client/ReactDOMComponentTree'
+import { getNodeFromInstance, precacheNode } from './client/ReactDOMComponentTree'
 
 const CONTENT_TYPES = {'string': true, 'number': true}
 
@@ -60,7 +60,7 @@ class ReactDOMComponent {
         let mountImage
 
         // 创建
-        if (transaction && transaction.useCreateElement || true) {
+        if (transaction.useCreateElement) {
             const ownerDocument = nativeContainerInfo._ownerDocument
             let el 
 
@@ -76,6 +76,8 @@ class ReactDOMComponent {
                     this._currentElement.type
                 )
             }
+
+            precacheNode(this, el)
 
             if (!this._nativeParent) {
                 DOMPropertyOperations.setAttributeForRoot(el);

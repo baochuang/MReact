@@ -7,6 +7,7 @@ import ReactDOMContainerInfo from '../ReactDOMContainerInfo'
 import DOMLazyTree from './utils/DOMLazyTree'
 import ReactUpdates from '../../react-reconciler/ReactUpdates'
 import ReactDOMFeatureFlags from '../ReactDOMFeatureFlags'
+import { precacheNode } from './ReactDOMComponentTree'
 
 export const render = function(nextElement, container, callback) {
     return renderSubtreeIntoContainer(
@@ -105,7 +106,7 @@ const mountComponentIntoNode = function(
 const mountImageIntoNode = function(
     markup,
     container,
-    wrapperInstance,
+    instance,
     transaction
 ){
     if (transaction.useCreateElement) {
@@ -115,5 +116,6 @@ const mountImageIntoNode = function(
         DOMLazyTree.insertTreeBefore(container, markup, null)
     } else {
         setInnerHTML(container, markup)
+        precacheNode(instance, container)
     }
 }
