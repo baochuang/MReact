@@ -1,33 +1,6 @@
 # Version 实现
+我们在第二版中的示例添加了一个Home组件，并在App中添加两个ref属性，添加了一个componentDidMount钩子方法，该钩子函数输出两个ref指向的对象，分别是DOM组件对象，直接返回其DOMElement，组定义组件对象
 
-## Ref
-
-### ReactElement
-添加ref
-### ReactReconciler
-在自定义组件将Virtual DOM绑定到真实DOM后，讲ref对应的真实DOM放入组件实例的refs对象中
-```
-transaction.getReactMountReady().enqueue(attachRefs, internalInstance)
-```
-### ReactMount
-启动Transaction
-```
-ReactUpdates.batchedUpdates(
-    batchedMountComponentIntoNode,
-    componentInstance,
-    container,
-    shouldReuseMarkup,
-    context
-)
-```
-
-### ReactUpdates & ReactDOMFeatureFlags.useCreateElement
-1. batchedUpdates
-2. ReactReconcileTransaction.getPooled
-3. transaction.perform
-
-### ReactDefaultBatchingStrategy
-
-### Transaction
-1. reinitializeTransaction
-2. perform
+## Transaction
+第一版中为了看到最直观的渲染，我们将React中的事务给移除掉了，在第二版中，由于添加了钩子函数，而钩子函数的触发是在特定生命周期中的，所以我们需要一个事务来帮助我们处理一个个组件的渲染和钩子函数的执行顺序。  
+怎么理解呢？以示例为例，它的组件生成和渲染顺序是怎么样的？
