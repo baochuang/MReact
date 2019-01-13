@@ -3,8 +3,8 @@
     "version": "0.0.1",
     "scripts": {
         "webpack": "webpack",
-        "babel": "babel examples/src/index.js --out-dir examples/lib",
-        "build": "webpack & babel examples/src/index.js --out-dir examples/lib"
+        "babel": "babel examples/src/event.js --out-dir examples/lib",
+        "build": "webpack & babel examples/src/event.js --out-dir examples/lib"
     },
     "dependencies": {
         "react": "15.0.0",

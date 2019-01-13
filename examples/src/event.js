@@ -1,8 +1,7 @@
 class App extends React.Component {
     render() {
-        const { text } = this.props
         return <div>
-            <button OnClick={() => { console.log('click event')}}>{text}</button>
+            <button onClick={() => { console.log('click event')}}>Console</button>
         </div>
     }
 }
