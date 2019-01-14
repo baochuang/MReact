@@ -12,7 +12,15 @@ const eventTypes = {
 }
 
 const EnterLeaveEventPlugin = {
-    eventTypes
+    eventTypes,
+    extractEvents: function(
+        topLevelType,
+        targetInst,
+        nativeEvent,
+        nativeEventTarget
+    ) {
+      
+    }
 }
 
 export default EnterLeaveEventPlugin

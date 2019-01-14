@@ -11,7 +11,15 @@ const eventTypes = {
 }
 
 const ChangeEventPlugin = {
-    eventTypes
+    eventTypes,
+    extractEvents: function(
+        topLevelType,
+        targetInst,
+        nativeEvent,
+        nativeEventTarget
+    ) {
+      
+    }
 }
 
 export default ChangeEventPlugin

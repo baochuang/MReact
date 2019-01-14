@@ -2,6 +2,7 @@ let EventPluginOrder = null
 const namesToPlugins = {}
 
 const EventPluginRegistry = {
+    plugins: [],
     registrationNameModules: {},
     registrationNameDependencies: {},
     injectEventPluginOrder: function(InjectedEventPluginOrder) {
@@ -33,6 +34,9 @@ function recomputePluginOrdering() {
     }
     for (var pluginName in namesToPlugins) {
         const PluginModule = namesToPlugins[pluginName]
+        const pluginIndex = EventPluginOrder.indexOf(pluginName)
+        
+        EventPluginRegistry.plugins[pluginIndex] = PluginModule
 
         const publishedEvents = PluginModule.eventTypes
 

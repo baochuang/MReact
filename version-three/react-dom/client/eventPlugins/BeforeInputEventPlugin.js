@@ -33,7 +33,15 @@ const eventTypes = {
 }
 
 const BeforeInputEventPlugin = {
-    eventTypes
+    eventTypes,
+    extractEvents: function(
+        topLevelType,
+        targetInst,
+        nativeEvent,
+        nativeEventTarget
+    ) {
+      
+    }
 }
 
 export default BeforeInputEventPlugin

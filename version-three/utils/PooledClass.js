@@ -43,7 +43,8 @@ const standardReleaser = function(instance) {
 }
 
 const PooledClass = {
-  addPoolingTo
+  addPoolingTo,
+  twoArgumentPooler
 }
 
 export default PooledClass

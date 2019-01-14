@@ -1,6 +1,7 @@
 import EventPluginRegistry from './EventPluginRegistry'
 import accumulateInto from '../../utils/accumulateInto'
 import EventPluginUtils from './EventPluginUtils'
+import forEachAccumulated from '../../utils/forEachAccumulated'
 
 let eventQueue = null
 

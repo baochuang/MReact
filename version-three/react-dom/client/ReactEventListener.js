@@ -1,6 +1,8 @@
 import EventListener from '../../utils/EventListener'
 import ReactUpdates from '../../react-reconciler/ReactUpdates'
 import PooledClass from '../../utils/PooledClass'
+import ReactDOMComponentTree from './ReactDOMComponentTree'
+import getEventTarget from './utils/getEventTarget'
 
 class TopLevelCallbackBookKeeping {
     constructor(topLevelType, nativeEvent) {
@@ -20,6 +22,41 @@ PooledClass.addPoolingTo(
     TopLevelCallbackBookKeeping,
     PooledClass.twoArgumentPooler
 )
+
+function handleTopLevelImpl(bookKeeping) {
+    const nativeEventTarget = getEventTarget(bookKeeping.nativeEvent)
+    let targetInst = ReactDOMComponentTree.getClosestInstanceFromNode(
+      nativeEventTarget
+    )
+  
+    let ancestor = targetInst
+    do {
+      bookKeeping.ancestors.push(ancestor)
+      ancestor = ancestor && findParent(ancestor)
+    } while (ancestor)
+  
+    for (let i = 0; i < bookKeeping.ancestors.length; i++) {
+      targetInst = bookKeeping.ancestors[i]
+      ReactEventListener._handleTopLevel(
+        bookKeeping.topLevelType,
+        targetInst,
+        bookKeeping.nativeEvent,
+        getEventTarget(bookKeeping.nativeEvent)
+      )
+    }
+}
+
+function findParent(inst) {
+    // TODO: It may be a good idea to cache this to prevent unnecessary DOM
+    // traversal, but caching is difficult to do correctly without using a
+    // mutation observer to listen for all DOM changes.
+    while (inst._nativeParent) {
+      inst = inst._nativeParent;
+    }
+    const rootNode = ReactDOMComponentTree.getNodeFromInstance(inst)
+    const container = rootNode.parentNode
+    return ReactDOMComponentTree.getClosestInstanceFromNode(container)
+}
 
 const ReactEventListener = {
     _enabled: true,
