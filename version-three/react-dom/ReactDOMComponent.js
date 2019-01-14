@@ -4,9 +4,41 @@ import DOMPropertyOperations from './DOMPropertyOperations'
 import DOMLazyTree from './client/utils/DOMLazyTree'
 
 import { getNodeFromInstance, precacheNode } from './client/ReactDOMComponentTree'
-import { registrationNameModules } from '../shared/event/EventPluginRegistry'
+import EventPluginRegistry from '../shared/event/EventPluginRegistry'
+import EventPluginHub from '../shared/event/EventPluginHub'
+import ReactBrowserEventEmitter from './client/ReactBrowserEventEmitter'
 
+const { listenTo } = ReactBrowserEventEmitter
+const { registrationNameModules } = EventPluginRegistry
 const CONTENT_TYPES = {'string': true, 'number': true}
+
+import ReactDOMButton from '../react-dom/client/wrappers/ReactDOMButton'
+
+function enqueuePutListener (inst, registrationName, listener, transaction) {
+    const containerInfo = inst._nativeContainerInfo
+    const doc = containerInfo._ownerDocument
+
+    if (!doc) {
+        return
+    }
+
+    listenTo(registrationName, doc)
+
+    transaction.getReactMountReady().enqueue(putListener, {
+        inst: inst,
+        registrationName: registrationName,
+        listener: listener,
+    })
+}
+
+function putListener() {
+    const listenerToPut = this
+    EventPluginHub.putListener(
+      listenerToPut.inst,
+      listenerToPut.registrationName,
+      listenerToPut.listener
+    )
+}
 
 class ReactDOMComponent {
     constructor(element) {
@@ -29,8 +61,13 @@ class ReactDOMComponent {
         this._nativeParent = nativeParent
         this._nativeContainerInfo = nativeContainerInfo
 
-        const props = this._currentElement.props
+        let props = this._currentElement.props
 
+        switch (this._tag) {
+            case 'button':
+                props = ReactDOMButton.getNativeProps(this, props, nativeParent)
+                break
+        }
         // namespace 还没去研究干啥的
         let namespaceURI
         let parentTag
@@ -84,6 +121,7 @@ class ReactDOMComponent {
                 DOMPropertyOperations.setAttributeForRoot(el);
             }
 
+            // 事件绑定入口
             this._updateDOMProperties(null, props, transaction)
 
             const lazyTree = DOMLazyTree(el)
@@ -95,6 +133,14 @@ class ReactDOMComponent {
 
         }
 
+        switch (this._tag) {
+            case 'button':
+                if (props.autoFocus) {
+                    // transaction.getReactMountReady().enqueue(AutoFocusUtils.focusDOMComponent, this)
+                }
+                break
+        }
+        
         return mountImage
     }
 
@@ -113,7 +159,11 @@ class ReactDOMComponent {
             const nextProp = nextProps[propKey]
 
             if (registrationNameModules.hasOwnProperty(propKey)) {
+                if (nextProp) {
+                    enqueuePutListener(this, propKey, nextProp, transaction)
+                } else if (lastProps) {
 
+                }
             }
         }
     }
