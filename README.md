@@ -21,10 +21,10 @@ const element = <App text='Hello World' />
 
 ReactDOM.render(element, rootContainer)
 ```
-1. React.Component
+1. React.Component和JSX
 2. ReactDOM.render
 3. Props状态绑定
-4. 组件渲染
+4. 组件渲染(含Virtual DOM)
 ## Version Two
 ```
 class Home extends React.Component {
