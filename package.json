@@ -3,7 +3,7 @@
     "version": "0.0.1",
     "scripts": {
         "env": "set version=three",
-        "babel": "node scripts/babel",
+        "babel": "babel examples/src -d examples/lib",
         "webpack": "webpack",
         "start": "node scripts/start"
     },
