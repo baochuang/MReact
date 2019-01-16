@@ -8,6 +8,7 @@ const ReactElement = function(type, key, ref, self, props) {
         ref: ref,
         props: props,
     }
+    debugger
     return element
 }
 
