@@ -2,10 +2,9 @@
     "name": "mreact",
     "version": "0.0.1",
     "scripts": {
-        "env": "set version=three",
         "babel": "babel examples/src -d examples/lib",
-        "webpack": "webpack",
-        "start": "node scripts/start"
+        "webpack": "export version=one && webpack",
+        "start": "export version=one && node scripts/start"
     },
     "dependencies": {
         "react": "15.0.0",
@@ -17,6 +16,7 @@
         "@babel/plugin-transform-react-jsx": "^7.2.0",
         "html-webpack-plugin": "^3.2.0",
         "opn": "^5.4.0",
-        "webpack": "^4.28.1"
+        "webpack": "^4.28.1",
+        "webpack-cli": "^3.2.1"
     }
 }

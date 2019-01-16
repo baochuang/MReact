@@ -8,7 +8,7 @@ const ReactElement = function(type, key, ref, self, props) {
         ref: ref,
         props: props,
     }
-    debugger
+    
     return element
 }
 
@@ -27,7 +27,7 @@ ReactElement.createElement = function(type, config, children) {
     } 
 
     const childrenLength = arguments.length - 2
-
+    debugger
     if (childrenLength === 1) {
         props.children = children
     } else if (childrenLength > 1) {
