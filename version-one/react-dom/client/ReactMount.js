@@ -1,87 +1,28 @@
-import ReactElement from '../../react/ReactElement'
-import TopLevelWrapper from '../TopLevelWrapper'
-import { emptyObject } from '../../constants'
 import instantiateReactComponent from '../../react-reconciler/instantiateReactComponent'
 import ReactReconciler from '../../react-reconciler/ReactReconciler'
 import ReactDOMContainerInfo from '../ReactDOMContainerInfo'
-import DOMLazyTree from './utils/DOMLazyTree'
 
-export const render = function(nextElement, container, callback) {
-    return renderSubtreeIntoContainer(
-        null,
-        nextElement,
-        container,
-        callback,
-    )
-}
+export const render = function(element, container) {
+    const componentInstance = instantiateReactComponent(element)
 
-const renderSubtreeIntoContainer = function(parentComponent, nextElement, container, callback) {
-
-    const nextWrappedElement = ReactElement(
-        TopLevelWrapper,
-        null,
-        null,
-        null,
-        nextElement
-    )
-
-    const component = renderNewRootComponent(
-        nextWrappedElement,
-        container,
-        parentComponent ? parentComponent._reactInternalInstance._processChildContext(
-            parentComponent._reactInternalInstance._context
-        ) : emptyObject 
-    )._renderedComponent.getPublicInstance()
-
-    if (callback) {
-
-    }
-
-    return component
-}
-
-const renderNewRootComponent = function(nextElement, container, context) {
-    const componentInstance = instantiateReactComponent(nextElement)
-
-    mountComponentIntoNode(componentInstance, container, context)
+    mountComponentIntoNode(componentInstance, container)
 
     return componentInstance
 }
 
 const mountComponentIntoNode = function(
-    wrapperInstance,
-    container,
-    context
+    instance,
+    container
 ) {
     const markup = ReactReconciler.mountComponent(
-        wrapperInstance,
-        { useCreateElement: true},
+        instance,
         null,
-        ReactDOMContainerInfo(wrapperInstance, container),
-        context
+        ReactDOMContainerInfo(container)
     )
-
-    wrapperInstance._renderedComponent._topLevelWrapper = wrapperInstance
 
     mountImageIntoNode(
         markup,
         container,
-        wrapperInstance
+        instance
     )
-}
-
-const mountImageIntoNode = function(
-    markup,
-    container,
-    wrapperInstance,
-    transaction = { useCreateElement : true}
-){
-    if (transaction.useCreateElement) {
-        while (container.lastChild) {
-            container.removeChild(container.lastChild)
-        }
-        DOMLazyTree.insertTreeBefore(container, markup, null)
-    } else {
-        setInnerHTML(container, markup)
-    }
 }

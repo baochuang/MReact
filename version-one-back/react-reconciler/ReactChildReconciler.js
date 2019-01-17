@@ -1,7 +1,8 @@
-import instantiateReactComponent from './instantiateReactComponent'
 import traverseAllChildren from '../utils/traverseAllChildren'
+import instantiateReactComponent from './instantiateReactComponent'
 
 function instantiateChild(childInstances, child, name) {
+    // We found a component instance.
     var keyUnique = (childInstances[name] === undefined);
     if (child != null && keyUnique) {
       childInstances[name] = instantiateReactComponent(child);
@@ -9,7 +10,7 @@ function instantiateChild(childInstances, child, name) {
 }
 
 const ReactChildReconciler = {
-    instantiateChildren: function(nestedChildNodes) {
+    instantiateChildren: function(nestedChildNodes, transaction, context) {
         if (nestedChildNodes == null) {
           return null
         }
