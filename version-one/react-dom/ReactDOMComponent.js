@@ -37,7 +37,7 @@ class ReactDOMComponent {
         const childrenToUse = contentToUse != null ? null : props.children
 
         if (contentToUse) {
-            // 将文本绑定到节点上去
+            DOMLazyTree.queueText(lazyTree, contentToUse)
         } else if (childrenToUse) {
             const mountImages = this.mountChildren(
                 childrenToUse
