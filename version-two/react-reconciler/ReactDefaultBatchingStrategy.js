@@ -1,11 +1,11 @@
-import Transaction from '../utils/Transaction'
 import { emptyFunction } from '../constants'
+import Transaction from '../utils/Transaction'
 import ReactUpdates from './ReactUpdates'
 
 const RESET_BATCHED_UPDATES = {
     initialize: emptyFunction,
     close: function() {
-      ReactDefaultBatchingStrategy.isBatchingUpdates = false
+        ReactDefaultBatchingStrategy.isBatchingUpdates = false;
     }
 }
   
@@ -13,7 +13,7 @@ const FLUSH_BATCHED_UPDATES = {
     initialize: emptyFunction,
     close: ReactUpdates.flushBatchedUpdates.bind(ReactUpdates)
 }
-
+  
 const TRANSACTION_WRAPPERS = [FLUSH_BATCHED_UPDATES, RESET_BATCHED_UPDATES]
 
 class ReactDefaultBatchingStrategyTransaction extends Transaction {
@@ -24,9 +24,10 @@ class ReactDefaultBatchingStrategyTransaction extends Transaction {
     }
 }
 
-function getTransactionWrappers() {
+const getTransactionWrappers = function() {
     return TRANSACTION_WRAPPERS
 }
+
 const transaction = new ReactDefaultBatchingStrategyTransaction()
 
 const ReactDefaultBatchingStrategy = {
@@ -38,9 +39,9 @@ const ReactDefaultBatchingStrategy = {
         ReactDefaultBatchingStrategy.isBatchingUpdates = true
 
         if (alreadyBatchingUpdates) {
-            callback(a, b, c);
+            callback(a, b, c)
         } else {
-            transaction.perform(callback, a, b, c);
+            transaction.perform(callback, a, b, c)
         }
     }
 }

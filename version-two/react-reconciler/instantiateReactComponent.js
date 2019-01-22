@@ -1,6 +1,7 @@
-import ReactEmptyComponent from './ReactEmptyComponent'
-import ReactNativeComponent from './ReactNativeComponent'
+
+import ReactDOMComponent from '../react-dom/ReactDOMComponent'
 import ReactCompositeComponent from './ReactCompositeComponent'
+import ReactDOMTextComponent from '../react-dom/ReactDOMTextComponent'
 
 class ReactCompositeComponentWrapper extends ReactCompositeComponent {
     constructor(element) {
@@ -15,17 +16,21 @@ function instantiateReactComponent(node) {
     let instance
 
     if (node === null) {
-        instance = ReactEmptyComponent.create(instantiateReactComponent) // 初始化ReactDOMEmptyComponent 空组件
+        // 初始化ReactDOMEmptyComponent 空组件
     } else if (typeof node === 'object') {
-        const element = node // 这里我们将节点称为元素
+        // 一般情况下我们拿到的节点就是转换后的ReactElement
+        const element = node 
 
         if (typeof element.type === 'string') {
-            instance = ReactNativeComponent.createInternalComponent(element) // 初始化ReactDOMComponent DOM标签组件
+            // 初始化ReactDOMComponent DOM标签组件
+            instance = new ReactDOMComponent(element) 
         } else {
-            instance = new ReactCompositeComponentWrapper(element) // 初始化ReactCompositeComponent 自定义标签组件 
+            // 初始化ReactCompositeComponent 自定义标签组件
+            instance = new ReactCompositeComponentWrapper(element)  
         }
     } else if (typeof node === 'string' || typeof node === 'number') {
-        instance = ReactNativeComponent.createInstanceForText(node) // 初始化ReactDOMTextComponent 文本组件
+        // 初始化ReactDOMTextComponent 文本组件
+        instance = new ReactDOMTextComponent(node)
     } 
 
     return instance

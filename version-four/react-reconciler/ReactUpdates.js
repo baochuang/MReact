@@ -1,15 +1,27 @@
-import ReactDefaultBatchingStrategy from './ReactDefaultBatchingStrategy'
-import ReactReconcileTransaction from '../react-dom/client/ReactReconcileTransaction'
+let batchingStrategy = null
 
-const batchingStrategy = ReactDefaultBatchingStrategy
+function batchedUpdates(callback, a, b, c) {
+    batchingStrategy.batchedUpdates(callback, a, b, c)
+}
 
-const batchedUpdates = function(callback, a, b) {
-    batchingStrategy.batchedUpdates(callback, a, b)
+function flushBatchedUpdates() {
+
+}
+
+const ReactUpdatesInjection = {
+    injectReconcileTransaction: function(ReconcilerTransaction) {
+        ReactUpdates.ReactReconcilerTransaction = ReconcilerTransaction
+    },
+    injectBatchingStrategy: function(_batchingStrategy) {
+        batchingStrategy = _batchingStrategy
+    }
 }
 
 const ReactUpdates = {
+    ReactReconcilerTransaction: null,
+    injection: ReactUpdatesInjection,
     batchedUpdates,
-    ReactReconcileTransaction
+    flushBatchedUpdates
 }
 
 export default ReactUpdates

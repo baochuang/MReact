@@ -1,7 +1,30 @@
-class Transaction {
+export default class Transaction {
     constructor() {
         this._isInTransaction = false
         this.getTransactionWrappers = null
+    }
+
+    perform(method, a, b, c) {
+        let errorThrow
+        let result
+        try {
+            this._isInTransaction = true
+
+            errorThrow = true
+
+            this.initializeAll(0)
+
+            result = method(a, b, c)
+
+            errorThrow = false
+        } finally {
+            try {
+                this.closeAll(0)
+            } finally {
+                this._isInTransaction = false
+            }
+        }
+        return result
     }
 
     reinitializeTransaction() {
@@ -15,58 +38,8 @@ class Transaction {
         this._isInTransaction = false
     }
 
-    perform(method, a, b, c, d) {
-        let errorThrow
-        let ret
-        try {
-            this._isInTransaction = true
-            errorThrow = true
-
-            //
-            this.initializeAll(0)
-
-            ret = method(a, b, c, d)
-
-            errorThrow = false
-        } finally {
-            try {
-                if (errorThrow) {
-                    try {
-                        this.closeAll(0)
-                    } catch (err) {
-
-                    }
-                } else {
-                    this.closeAll(0)
-                }
-            } finally {
-                this._isInTransaction = false
-            }
-        }
-        return ret
-    }
-
     initializeAll(startIndex) {
-        const transactionWrappers = this.transactionWrappers
 
-        for (let i = startIndex; i < transactionWrappers.length; i++) {
-            const wrapper = transactionWrappers[i]
-
-            try {
-                this.wrapperInitData[i] = Transaction.OBSERVED_ERROR
-                this.wrapperInitData[i] = wrapper.initialize ?
-                    wrapper.initialize.call(this) :
-                    null
-            } finally {
-                if (this.wrapperInitData[i] === Transaction.OBSERVED_ERROR) {
-                    try {
-                        this.initializeAll(i + 1)
-                    } catch (err) {
-                    }
-                }
-            }
-
-        }
     }
 
     closeAll(startIndex) {
@@ -96,11 +69,7 @@ class Transaction {
                 }
             }
         }
-
-        this.wrapperInitData.length = 0
     }
 }
 
 Transaction.OBSERVED_ERROR = {}
-
-export default Transaction

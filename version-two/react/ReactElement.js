@@ -1,22 +1,12 @@
 const REACT_ELEMENT_TYPE = (typeof Symbol === 'function' && Symbol.for && Symbol.for('react.element')) || 0xeac7
 
-const RESERVED_PROPS = {
-    key: true,
-    ref: true
-}
-
-const ReactElement = function(type, key, ref, self, owner, props) {
+const ReactElement = function(type, props) {
     const element = {
         $$typeof: REACT_ELEMENT_TYPE,
         type: type,
-        key: key,
-        _self: self,
-        ref: ref,
         props: props,
-
-        // 在attachRef的时候用到
-        _owner: owner
     }
+    
     return element
 }
 
@@ -24,18 +14,19 @@ ReactElement.createElement = function(type, config, children) {
 
     const props = {}
 
-    let key = null
-    let ref = null
-    let self = null
-
     if (config) {
-        ref = config.ref || undefined
+        let defaultProps
+
+        if (element.type && element.type.defaultProps) {
+            defaultProps = element.type.defaultProps
+        }
+
         for (let propName in config) {
-            if (config.hasOwnProperty(propName) && !RESERVED_PROPS.hasOwnProperty(propName)) {
-                props[propName] = config[propName]
-            }
+            props[propName] = config[propName] || defaultProps[propName]
         }
     } 
+
+
 
     const childrenLength = arguments.length - 2
 
@@ -49,23 +40,9 @@ ReactElement.createElement = function(type, config, children) {
         props.children = childArray
     }
     
-      // Resolve default props
-    if (type && type.defaultProps) {
-        const defaultProps = type.defaultProps
-        for (propName in defaultProps) {
-            if (props[propName] === undefined) {
-                props[propName] = defaultProps[propName]
-            }
-        }
-    }
-    
     return ReactElement(
         type,
-        key,
-        ref,
-        self,
-        Share.ReactCurrentOwner.current,
-        props,
+        props
     )
 }
 
@@ -76,4 +53,5 @@ ReactElement.isValidElement =  function(object) {
       object.$$typeof === REACT_ELEMENT_TYPE
     )
 }
+
 export default ReactElement

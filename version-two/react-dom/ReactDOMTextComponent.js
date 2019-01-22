@@ -1,24 +1,26 @@
+import DOMLazyTree from "./client/utils/DOMLazyTree";
 
-class ReactDOMTextComponent {
+export default class ReactDOMTextComponent  {
     constructor(text) {
         this._currentElement = text
-
-        this._nativeNode = null
-        this._nativeParent = null
-
-        this._domID = null
+        this._stringText = '' + text
     }
 
     mountComponent(
         transaction,
         nativeParent,
-        nativeContainerInfo,
-        context
+        nativeContainerInfo
     ) {
+        const ownerDocument =nativeContainerInfo._ownerDocument
+        const lazyTree = DOMLazyTree(ownerDocument.createDocumentFragment())
 
-    }
+        if (this._stringText) {
+            DOMLazyTree.queueChild(
+                lazyTree,
+                DOMLazyTree(ownerDocument.createTextNode(this._stringText))
+            )
+        }
 
-    receiveComponent(nextText, transaction) {
-    
+        return lazyTree
     }
 }

@@ -18,6 +18,10 @@ export default class CallbackQueue {
         this._contexts = null
     }
 
+    destructor() {
+        this.reset()
+    }
+
     notifyAll() {
         const callbacks = this._callbacks
         const contexts = this._contexts
@@ -30,7 +34,7 @@ export default class CallbackQueue {
           callbacks.length = 0
           contexts.length = 0
         }
-    }
+      }
 }
 
 PooledClass.addPoolingTo(CallbackQueue)

@@ -23,7 +23,7 @@ module.exports = (env, argv) => {
             })
         ]
     }
-    if (version !== 'one' && version !== 'four') {
+    if (version !== 'one' && version !== 'two') {
         config.entry['share'] = `./version-${version}/shared/index.js`
     } 
     return config
