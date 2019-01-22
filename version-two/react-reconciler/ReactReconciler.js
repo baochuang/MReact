@@ -11,6 +11,13 @@ const ReactReconciler = {
             nativeContainerInfo
         ) 
         return markup
+    },
+
+    performUpdateIfNecessary(
+        internalInstance,
+        transaction
+    ) {
+        internalInstance.performUpdateIfNecessary(transaction)
     }
 }
 

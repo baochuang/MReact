@@ -526,12 +526,182 @@ class ReactCompositeComponent {
 ```
 可以看出setState调用的this.updater对象为ReactUpdateQueue对象
 ```
+const ReactUpdateQueue = {
+    enqueueSetState: function(publicInstance, partialState) {
+        const internalInstance = getInternalInstanceReadyForUpdate(publicInstance)
+    
+        ......
+    }
+}
+```
+这里的publicInstance是我们的Clock的实例，partialState是我们传入的{date: new Date()}对象，我们先看getInternalInstanceReadyForUpdate方法
+```
+function getInternalInstanceReadyForUpdate(publicInstance) {
+    const internalInstance = ReactInstanceMap.get(publicInstance)
+  
+    return internalInstance
+}
+```
+我们以publicInstance为key调用ReactInstanceMap对象的get方法获取value并返回，在我们上文中，并没有存储这么一条记录，现在我们把存储的这部分实现,毫无疑问这部分的实现自然是在ReactCompositeComponent内
+```
+mountComponent(
+    ......
+) {
+     let inst
+
+    ......
+
+    // 判断是否为继承React.Component类的组件
+    if (Component.prototype && Component.prototype.isReactComponent) {
+        inst = new Component(publicProps, ReactUpdateQueue)
+    }
+
+    ......
+
+    ReactInstanceMap.set(inst, this)
+}
 
 ```
+这里我们同样看看ReactInstanceMap
+```
+const ReactInstanceMap = {
+ 
+    get: function(key) {
+      return key._reactInternalInstance
+    },
+  
+    set: function(key, value) {
+      key._reactInternalInstance = value
+    }
+  
+}
+```
+这样我们知道，通过传入的Clock类实例我们拿到了其对应的ReactCompositeComponent类的实例,接下来我们继续分析
+```
+const ReactUpdateQueue = {
+    enqueueSetState: function(publicInstance, partialState) {
+        const internalInstance = getInternalInstanceReadyForUpdate(publicInstance)
+    
+        if (!internalInstance) {
+          return
+        }
+    
+        const queue = internalInstance._pendingStateQueue || (internalInstance._pendingStateQueue = [])
 
+        queue.push(partialState)
+    
+        enqueueUpdate(internalInstance)
+    }
+}
+```
+获取这个ReactCompositeComponent类的实例的_pendingStateQueue, 同样这个实例属性在上文是没有实现的，我们先在mount函数中，给它填上
+```
+mountComponent(
+    ......
+) {
+    ......
+    this._pendingStateQueue = null
+    ......
+}
+```
+目前我们的queue对象为空数组，然后我们将{date: new Date()}放入这个数组当中，然后执行enqueueUpdate
+```
+function enqueueUpdate(internalInstance) {
+  ReactUpdates.enqueueUpdate(internalInstance)
+}
+```
+我们接下来看ReactUpdates.enqueueUpdate的实现
+```
+let dirtyComponents = []
+
+function enqueueUpdate(component) {
+    dirtyComponents.push(component)
+}
+```
+我们将Clock类组件对应的ReactCompositeComponent实例放入dirtyComponents数组中，这时候我们的enqueueSetState就算执行完成，那么它的state值是在哪个阶段更新的呢？
+```
+function flushBatchedUpdates() {
+    while (dirtyComponents.length) {
+        const transaction = ReactUpdatesFlushTransaction.getPooled()
+        transaction.perform(runBatchedUpdates, transaction)
+        ReactUpdatesFlushTransaction.release(transaction)
+    }
+}
+```
+自然是在我们的事务任务FLUSH_BATCHED_UPDATES当中，最终是在flushBatchedUpdates函数中执行,这里我们区分我们之前的DOM调度事务，使用新的事务实现ReactUpdatesFlushTransaction
+```
+const NESTED_UPDATES = {
+    initialize: function() {
+      this.dirtyComponentsLength = dirtyComponents.length
+    },
+    close: function() {
+
+    }
+}
+  
+const UPDATE_QUEUEING = {
+    initialize: function() {
+      this.callbackQueue.reset()
+    },
+    close: function() {
+      this.callbackQueue.notifyAll()
+    }
+}
+
+const TRANSACTION_WRAPPERS = [NESTED_UPDATES, UPDATE_QUEUEING]
+
+const getTransactionWrappers = function() {
+    return TRANSACTION_WRAPPERS
+}
+
+export class ReactUpdatesFlushTransaction extends Transaction {
+    constructor() {
+        super()
+        this.getTransactionWrappers = getTransactionWrappers
+        this.reinitializeTransaction()
+        this.dirtyComponentsLength = null
+        this.callbackQueue = CallbackQueue.getPooled()
+    }
+}
+
+ReactUpdatesFlushTransaction.release = function(transaction) {
+
+}
+
+PooledClass.addPoolingTo(PooledClass)
+```
+新的事务主要对dirtyComponent的处理，我们继续看runBatchedUpdates
+```
+function mountOrderComparator(c1, c2) {
+    return c1._mountOrder - c2._mountOrder;
+}
+
+function runBatchedUpdates(transaction) {
+    const len = transaction.dirtyComponentsLength
+
+    dirtyComponents.sort(mountOrderComparator)
+
+    for (var i = 0; i < len; i++) {
+        var component = dirtyComponents[i]
+
+        ReactReconciler.performUpdateIfNecessary(
+            component,
+            transaction.reconcileTransaction
+        )
+    }
+}
+```
+```
+const ReactReconciler = {
+    performUpdateIfNecessary: function(
+        internalInstance,
+        transaction
+    ) {
+        internalInstance.performUpdateIfNecessary(transaction)
+    }
+}
 ```
 
-```
 ## 依赖注入
 React源码采用了依赖注入的方式来解决，这种方式在很多地方被采用，后面还会出现。
 ```
