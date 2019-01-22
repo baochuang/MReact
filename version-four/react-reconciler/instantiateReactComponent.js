@@ -1,6 +1,7 @@
 
 import ReactDOMComponent from '../react-dom/ReactDOMComponent'
 import ReactCompositeComponent from './ReactCompositeComponent'
+import ReactDOMTextComponent from '../react-dom/ReactDOMTextComponent'
 
 class ReactCompositeComponentWrapper extends ReactCompositeComponent {
     constructor(element) {
@@ -29,6 +30,7 @@ function instantiateReactComponent(node) {
         }
     } else if (typeof node === 'string' || typeof node === 'number') {
         // 初始化ReactDOMTextComponent 文本组件
+        instance = new ReactDOMTextComponent(node)
     } 
 
     return instance

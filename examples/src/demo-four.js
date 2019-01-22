@@ -1,30 +1,37 @@
-class App extends React.Component {
+class Clock extends React.Component {
     constructor(props) {
-        super(props)
-        this.state = {
-            count: 1
-        }
-        this.add = this.add.bind(this)
+      super(props)
+      this.state = {date: new Date()}
     }
-
-    add() {
-        this.setState({
-            count: ++this.state.count
-        })
+  
+    componentDidMount() {
+      this.timerID = setInterval(
+        () => this.tick(),
+        1000
+      )
     }
-    
+  
+    componentWillUnmount() {
+      clearInterval(this.timerID)
+    }
+  
+    tick() {
+      this.setState({
+        date: new Date()
+      })
+    }
+  
     render() {
-        return <div>
-            <button onClick={this.add}></button>
-            <div>
-                <h1>{this.state.count}</h1>
-            </div>
+      return (
+        <div>
+          <h1>Hello, world!</h1>
+          <h2>It is {this.state.date.toLocaleTimeString()}.</h2>
         </div>
+      )
     }
 }
 
-const rootContainer = document.querySelector('#root')
-
-const element = <App />
-
-ReactDOM.render(element, rootContainer)
+ReactDOM.render(
+    <Clock />,
+    document.getElementById('root')
+)

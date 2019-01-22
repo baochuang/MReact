@@ -35,12 +35,20 @@ export default class ReactCompositeComponent {
         // 执行render
         const markup = this.performInitialMount(renderedElement, nativeParent, nativeContainerInfo)
 
+        if (inst.componentDidMount) {
+            // transaction.getReactMountReady().enqueue(inst.componentDidMount, inst);
+        }
+
         return markup
     } 
 
     performInitialMount(renderedElement, nativeParent, nativeContainerInfo) {
         const inst = this._instance
 
+        if (inst.componentWillMount) {
+            inst.componentWillMount()
+        }
+        
         if (renderedElement === undefined) {
             renderedElement = this._renderComponent()
         }
