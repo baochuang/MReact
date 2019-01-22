@@ -500,7 +500,35 @@ tick() {
     })
 }
 ```
-终于我们的componentDidMount函数被执行了，接下来就是this.setState方法被调用了，由一期内容可以this是我们的ReactComposite组件示例，自然setState方法也是在这里被实现
+终于我们的componentDidMount函数被执行了，接下来就是this.setState方法被调用了，在示例中我们的App Class是继承自ReactComponent类，该类实现了setState方法
+```
+class ReactComponent {
+    constructor(props, updater) {
+        this.props = props
+        this.updater = updater
+    }
+
+    setState(partialState, callback) {
+        this.updater.enqueueSetState(this, partialState)
+    }
+}
+
+class ReactCompositeComponent {
+    ......
+    mountComponent() {
+        ......
+        if (Component.prototype && Component.prototype.isReactComponent) {
+            inst = new Component(publicProps, ReactUpdateQueue)
+        }
+    }
+    ......
+}
+```
+可以看出setState调用的this.updater对象为ReactUpdateQueue对象
+```
+
+```
+
 ```
 
 ```

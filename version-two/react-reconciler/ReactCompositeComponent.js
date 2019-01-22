@@ -1,4 +1,5 @@
 import ReactReconciler from '../react-reconciler/ReactReconciler'
+import ReactUpdateQueue from './ReactUpdateQueue'
 
 export default class ReactCompositeComponent {
     constructor(element) {
@@ -26,7 +27,7 @@ export default class ReactCompositeComponent {
 
         // 判断是否为继承React.Component类的组件
         if (Component.prototype && Component.prototype.isReactComponent) {
-            inst = new Component(publicProps)
+            inst = new Component(publicProps, ReactUpdateQueue)
         }
 
         inst.props = publicProps

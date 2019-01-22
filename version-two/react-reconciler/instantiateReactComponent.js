@@ -2,7 +2,6 @@
 import ReactDOMComponent from '../react-dom/ReactDOMComponent'
 import ReactCompositeComponent from './ReactCompositeComponent'
 import ReactDOMTextComponent from '../react-dom/ReactDOMTextComponent'
-
 class ReactCompositeComponentWrapper extends ReactCompositeComponent {
     constructor(element) {
         super(element)
