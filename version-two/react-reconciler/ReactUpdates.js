@@ -13,7 +13,11 @@ const NESTED_UPDATES = {
       this.dirtyComponentsLength = dirtyComponents.length
     },
     close: function() {
-
+        if (this.dirtyComponentsLength !== dirtyComponents.length) {
+            
+        } else {
+            dirtyComponents.length = 0
+        }
     }
 }
   
