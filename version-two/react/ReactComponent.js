@@ -1,4 +1,3 @@
-import ReactNoopUpdateQueue from './ReactNoopUpdateQueue'
 
 export default class ReactComponent {
     constructor(props, updater) {

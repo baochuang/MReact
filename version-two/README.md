@@ -556,6 +556,7 @@ mountComponent(
         inst = new Component(publicProps, ReactUpdateQueue)
     }
 
+    inst.updater = ReactUpdateQueue
     ......
 
     ReactInstanceMap.set(inst, this)
@@ -668,9 +669,32 @@ ReactUpdatesFlushTransaction.release = function(transaction) {
 
 }
 
-PooledClass.addPoolingTo(PooledClass)
+PooledClass.addPoolingTo(ReactUpdatesFlushTransaction)
 ```
-新的事务主要对dirtyComponent的处理，我们继续看runBatchedUpdates
+新的事务主要对dirtyComponent的处理，该事物的两个wrapper的initialize被实现，所以，我们需要在Transaction对initialize做实现了
+```
+initializeAll(startIndex) {
+    const transactionWrappers = this.transactionWrappers
+
+    for (let i = startIndex; i < transactionWrappers.length; i++) {
+        const wrapper = transactionWrappers[i]
+        try {
+            this.wrapperInitData[i] = Transaction.OBSERVED_ERROR
+            this.wrapperInitData[i] = wrapper.initialize ?
+                wrapper.initialize.call(this) : null
+        } finally {
+            if (this.wrapperInitData[i] === Transaction.OBSERVED_ERROR) {
+                try {
+                    this.initializeAll(i + 1)
+                } catch(err) {
+                    
+                }
+            }
+        }
+    }
+}
+```
+我们继续看runBatchedUpdates
 ```
 function mountOrderComparator(c1, c2) {
     return c1._mountOrder - c2._mountOrder;
@@ -701,6 +725,7 @@ const ReactReconciler = {
     }
 }
 ```
+
 
 ## 依赖注入
 React源码采用了依赖注入的方式来解决，这种方式在很多地方被采用，后面还会出现。

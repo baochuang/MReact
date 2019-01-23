@@ -26,3 +26,5 @@ const ReactUpdateQueue = {
         enqueueUpdate(internalInstance)
     }
 }
+
+export default ReactUpdateQueue

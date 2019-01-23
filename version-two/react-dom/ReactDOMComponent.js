@@ -1,5 +1,6 @@
 import DOMLazyTree from './client/utils/DOMLazyTree'
 import ReactMultiChild from '../react-reconciler/ReactMultiChild'
+import { getNodeFromInstance as getNode } from  './client/ReactDOMComponentTree'
 
 const CONTENT_TYPES = {'string': true, 'number': true}
 class ReactDOMComponent {
@@ -7,6 +8,7 @@ class ReactDOMComponent {
         const tag = element.type
         this._currentElement = element
         this._tag = tag.toLowerCase()
+        this._nativeNode = null
     }
 
     mountComponent(
@@ -48,6 +50,43 @@ class ReactDOMComponent {
                 DOMLazyTree.queueChild(lazyTree, mountImages[i]);
             }
         }
+    }
+
+    receiveComponent(nextElement, transaction) {
+        const prevElement = this._currentElement
+        this._currentElement = nextElement
+        this.updateComponent(transaction, prevElement)
+    }
+
+    updateComponent(transaction, prevElement) {
+        const lastProps = prevElement.props
+        const nextProps = this._currentElement.props
+
+        this._updateDOMChildren(
+            lastProps,
+            nextProps,
+            transaction
+        )
+    }
+
+    _updateDOMChildren(lastProps, nextProps, transaction) {
+        const lastContent = CONTENT_TYPES[typeof lastProps.children] ? lastProps.children : null
+        const nextContent = CONTENT_TYPES[typeof nextProps.children] ? nextProps.children : null
+
+        const lastChildren = lastContent != null ? null : lastProps.children
+        const nextChildren = nextContent != null ? null : nextProps.children
+
+        if (nextContent != null) {
+            if (lastContent !== nextContent) {
+            
+            }
+        } else if (nextChildren != null) {
+            this.updateChildren(nextChildren, transaction)
+        } 
+    }
+
+    getNativeNode() {
+        return getNode(this)
     }
 }
 

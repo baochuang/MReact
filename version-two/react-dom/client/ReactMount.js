@@ -3,6 +3,7 @@ import ReactReconciler from '../../react-reconciler/ReactReconciler'
 import ReactDOMContainerInfo from '../ReactDOMContainerInfo'
 import DOMLazyTree from './utils/DOMLazyTree'
 import ReactUpdates from '../../react-reconciler/ReactUpdates'
+import ReactDOMFeatureFlags from '../ReactDOMFeatureFlags'
 
 export const render = function(element, container) {
     const componentInstance = instantiateReactComponent(element)
@@ -20,7 +21,7 @@ const batchedMountComponentIntoNode = function(
     componentInstance,
     container
 ) {
-    const transaction = ReactUpdates.ReactReconcileTransaction.getPooled()
+    const transaction = ReactUpdates.ReactReconcileTransaction.getPooled(ReactDOMFeatureFlags.useCreateElement)
 
     transaction.perform(
         mountComponentIntoNode,

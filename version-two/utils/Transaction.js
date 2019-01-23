@@ -39,7 +39,24 @@ export default class Transaction {
     }
 
     initializeAll(startIndex) {
+        const transactionWrappers = this.transactionWrappers
 
+        for (let i = startIndex; i < transactionWrappers.length; i++) {
+            const wrapper = transactionWrappers[i]
+            try {
+                this.wrapperInitData[i] = Transaction.OBSERVED_ERROR
+                this.wrapperInitData[i] = wrapper.initialize ?
+                    wrapper.initialize.call(this) : null
+            } finally {
+                if (this.wrapperInitData[i] === Transaction.OBSERVED_ERROR) {
+                    try {
+                        this.initializeAll(i + 1)
+                    } catch(err) {
+                        
+                    }
+                }
+            }
+        }
     }
 
     closeAll(startIndex) {

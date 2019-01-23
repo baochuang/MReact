@@ -1,6 +1,7 @@
 import ReactReconciler from '../react-reconciler/ReactReconciler'
 import ReactUpdateQueue from './ReactUpdateQueue'
 import ReactInstanceMap from './ReactInstanceMap'
+import shouldUpdateReactComponent from './shouldUpdateReactComponent'
 
 let nextMountID = 1
 
@@ -38,10 +39,17 @@ export default class ReactCompositeComponent {
         }
 
         inst.props = publicProps
-
+        inst.updater = ReactUpdateQueue
+        
         this._instance = inst
 
         ReactInstanceMap.set(inst, this)
+
+        const initialState = inst.state
+
+        if (initialState === undefined) {
+            inst.state = initialState = null
+        }
 
         this._pendingStateQueue = null
         
@@ -91,9 +99,7 @@ export default class ReactCompositeComponent {
           this.updateComponent(
             transaction,
             this._currentElement,
-            this._currentElement,
-            this._context,
-            this._context
+            this._currentElement
           );
         }
     }
@@ -102,65 +108,119 @@ export default class ReactCompositeComponent {
         transaction,
         prevParentElement,
         nextParentElement,
-        prevUnmaskedContext,
-        nextUnmaskedContext
       ) {
-        // var inst = this._instance
-        // var willReceive = false
-        // var nextContext
-        // var nextProps
+        const inst = this._instance
+        let willReceive = false
+        let nextProps
     
-        // // Determine if the context has changed or not
-        // if (this._context === nextUnmaskedContext) {
-        //   nextContext = inst.context;
-        // } else {
-        //   nextContext = this._processContext(nextUnmaskedContext);
-        //   willReceive = true;
-        // }
+        if (prevParentElement === nextParentElement) {
+            nextProps = nextParentElement.props;
+        } else {
+            nextProps = nextParentElement.props
+            willReceive = true
+        }
     
-        // // Distinguish between a props update versus a simple state update
-        // if (prevParentElement === nextParentElement) {
-        //   // Skip checking prop types again -- we don't read inst.props to avoid
-        //   // warning for DOM component props in this upgrade
-        //   nextProps = nextParentElement.props;
-        // } else {
-        //   nextProps = this._processProps(nextParentElement.props);
-        //   willReceive = true;
-        // }
+        if (willReceive && inst.componentWillReceiveProps) {
+            inst.componentWillReceiveProps(nextProps)
+        }
     
-        // // An update here will schedule an update but immediately set
-        // // _pendingStateQueue which will ensure that any state updates gets
-        // // immediately reconciled instead of waiting for the next batch.
-        // if (willReceive && inst.componentWillReceiveProps) {
-        //   inst.componentWillReceiveProps(nextProps, nextContext);
-        // }
+        const nextState = this._processPendingState(nextProps)
     
-        // var nextState = this._processPendingState(nextProps, nextContext);
+        const shouldUpdate = !inst.shouldComponentUpdate ||
+                    inst.shouldComponentUpdate(nextProps, nextState)
     
-        // var shouldUpdate =
-        //   this._pendingForceUpdate ||
-        //   !inst.shouldComponentUpdate ||
-        //   inst.shouldComponentUpdate(nextProps, nextState, nextContext);
-    
-        // if (shouldUpdate) {
-        //   this._pendingForceUpdate = false;
-        //   // Will set `this.props`, `this.state` and `this.context`.
-        //   this._performComponentUpdate(
-        //     nextParentElement,
-        //     nextProps,
-        //     nextState,
-        //     nextContext,
-        //     transaction,
-        //     nextUnmaskedContext
-        //   );
-        // } else {
-        //   // If it's determined that a component should not update, we still want
-        //   // to set props and state but we shortcut the rest of the update.
-        //   this._currentElement = nextParentElement;
-        //   this._context = nextUnmaskedContext;
-        //   inst.props = nextProps;
-        //   inst.state = nextState;
-        //   inst.context = nextContext;
-        // }
+        if (shouldUpdate) {
+          this._performComponentUpdate(
+            nextParentElement,
+            nextProps,
+            nextState,
+            transaction
+          )
+        } else {
+          this._currentElement = nextParentElement
+          inst.props = nextProps;
+          inst.state = nextState;
+        }
+    }
+
+    _processPendingState(props) {
+        const inst = this._instance
+        const queue = this._pendingStateQueue
+
+        if (!queue) {
+            return inst.state
+        }
+
+        const nextState = Object.assign({}, inst.state)
+
+        for (let i = 0; i < queue.length; i++) {
+            const partial = queue[i]
+            Object.assign(nextState, typeof partial === 'function' ? partial.call(inst, nextState, props) : partial)
+        }
+
+        return nextState
+    }
+
+    _performComponentUpdate(
+        nextElement,
+        nextProps,
+        nextState,
+        transaction
+    ) {
+        const inst = this._instance
+
+        let prevProps
+        let prevState
+
+        if (inst.componentDidUpdate) {
+            prevProps = inst.props
+            prevState = inst.state
+        }
+
+        if (inst.componentWillUpdate) {
+            inst.componentWillUpdate(nextProps, nextState)
+        }
+
+        this._currentElement = nextElement
+        inst.props = nextProps
+        inst.state = nextState
+
+        this._updateRenderedComponent(transaction)
+
+        if (inst.componentDidUpdate) {
+            transaction.getReactMountReady().enqueue(
+                inst.componentDidUpdate.bind(inst, prevProps, prevState),
+                inst
+            )
+        }
+    }
+
+    _updateRenderedComponent(transaction) {
+        const prevComponentInstance = this._renderedComponent
+        const prevRenderedElement = prevComponentInstance._currentElement
+        const nextRenderedElement = this._renderComponent()
+
+        if (shouldUpdateReactComponent(prevRenderedElement, nextRenderedElement)) {
+            ReactReconciler.receiveComponent(
+                prevComponentInstance,
+                nextRenderedElement,
+                transaction
+            )
+        } else {
+
+        }
+    }
+
+    receiveComponent(
+        nextElement,
+        transaction
+    ) {
+        const prevElement = this._currentElement
+
+        this.updateComponent(
+            transaction,
+            prevElement,
+            nextElement
+        )
     }
 }

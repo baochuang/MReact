@@ -1,4 +1,5 @@
 import ReactReconcileTransaction from '../react-dom/client/ReactReconcileTransaction'
+import ReactReconciler from './ReactReconciler'
 
 import Transaction from '../utils/Transaction'
 import PooledClass from '../utils/PooledClass'
@@ -46,7 +47,7 @@ ReactUpdatesFlushTransaction.release = function(transaction) {
 
 }
 
-PooledClass.addPoolingTo(PooledClass)
+PooledClass.addPoolingTo(ReactUpdatesFlushTransaction)
 
 function mountOrderComparator(c1, c2) {
     return c1._mountOrder - c2._mountOrder;
@@ -71,10 +72,12 @@ const batchedUpdates = function(callback, a, b, c) {
 }
 
 function flushBatchedUpdates() {
-    while (dirtyComponents.length) {
+    let count = 1
+    while (dirtyComponents.length && count < 100) {
         const transaction = ReactUpdatesFlushTransaction.getPooled()
         transaction.perform(runBatchedUpdates, transaction)
         ReactUpdatesFlushTransaction.release(transaction)
+        count++
     }
 }
 
@@ -85,6 +88,9 @@ const ReactUpdatesInjection = {
 }
 
 function enqueueUpdate(component) {
+    if (!batchingStrategy.isBatchingUpdates) {
+        batchingStrategy.batchedUpdates(enqueueUpdate, component)
+    }
     dirtyComponents.push(component)
 }
 

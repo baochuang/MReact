@@ -18,6 +18,24 @@ const ReactReconciler = {
         transaction
     ) {
         internalInstance.performUpdateIfNecessary(transaction)
+    },
+
+    receiveComponent: function(
+        internalInstance, 
+        nextElement, 
+        transaction
+    ) {
+        const prevElement = internalInstance._currentElement
+
+        if (nextElement === prevElement) {
+            return
+        }
+
+        internalInstance.receiveComponent(nextElement, transaction)
+    },
+
+    getNativeNode: function(internalInstance) {
+        return internalInstance.getNativeNode()
     }
 }
 
