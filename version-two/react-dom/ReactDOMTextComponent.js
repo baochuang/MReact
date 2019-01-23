@@ -1,6 +1,7 @@
 import DOMLazyTree from "./client/utils/DOMLazyTree";
-import { getNodeFromInstance } from './client/ReactDOMComponentTree'
+import { getNodeFromInstance, precacheNode } from './client/ReactDOMComponentTree'
 import { COMMENT_NODE_TYPE } from '../constants/nodeTypes'
+import DOMChildrenOperations from './client/utils/DOMChildrenOperations'
 
 const commentValue = ' /react-text '
 export default class ReactDOMTextComponent  {
@@ -17,12 +18,15 @@ export default class ReactDOMTextComponent  {
         nativeParent,
         nativeContainerInfo
     ) {
+        const domID = nativeContainerInfo._idCounter++
+        const openingValue = ' react-text: ' + domID + ' '
         if(transaction.useCreateElement) {
             const ownerDocument =nativeContainerInfo._ownerDocument
             const lazyTree = DOMLazyTree(ownerDocument.createDocumentFragment())
             
             const closingComment = ownerDocument.createComment(commentValue)
-
+            const openingComment = ownerDocument.createComment(openingValue)
+            DOMLazyTree.queueChild(lazyTree, DOMLazyTree(openingComment))
             if (this._stringText) {
                 DOMLazyTree.queueChild(
                     lazyTree,
@@ -32,7 +36,7 @@ export default class ReactDOMTextComponent  {
     
             DOMLazyTree.queueChild(lazyTree, DOMLazyTree(closingComment))
 
-            ReactDOMComponentTree.precacheNode(this, openingComment)
+            precacheNode(this, openingComment)
 
             this._closingComment = closingComment
 
@@ -58,7 +62,7 @@ export default class ReactDOMTextComponent  {
     }
 
     getNativeNode() {
-        const nativeNode = this._commentNodes
+        let nativeNode = this._commentNodes
 
         if (nativeNode) {
             return nativeNode

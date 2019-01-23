@@ -9,6 +9,7 @@ class ReactDOMComponent {
         this._currentElement = element
         this._tag = tag.toLowerCase()
         this._nativeNode = null
+        this._domID = null
     }
 
     mountComponent(
@@ -16,6 +17,7 @@ class ReactDOMComponent {
         nativeParent,
         nativeContainerInfo,
     ) {
+        this._domID = nativeContainerInfo._idCounter++
         this._nativeParent = nativeParent
         this._nativeContainerInfo = nativeContainerInfo
 
