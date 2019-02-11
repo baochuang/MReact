@@ -1,8 +1,9 @@
-
+import { emptyObject } from '../constants'
 export default class ReactComponent {
     constructor(props, updater) {
         this.props = props
         this.updater = updater
+        this.refs = emptyObject
     }
 
     setState(partialState, callback) {

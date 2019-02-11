@@ -3,7 +3,17 @@ import ReactUpdateQueue from './ReactUpdateQueue'
 import ReactInstanceMap from './ReactInstanceMap'
 import shouldUpdateReactComponent from './shouldUpdateReactComponent'
 
+import { emptyObject } from '../constants';
+
 let nextMountID = 1
+
+function StatelessComponent(Component) {}
+
+StatelessComponent.prototype.render = function() {
+  var Component = ReactInstanceMap.get(this)._currentElement.type
+  var element = Component(this.props, this.context, this.updater)
+  return element
+}
 
 export default class ReactCompositeComponent {
     constructor(element) {
@@ -35,10 +45,22 @@ export default class ReactCompositeComponent {
 
         // 判断是否为继承React.Component类的组件
         if (Component.prototype && Component.prototype.isReactComponent) {
-            inst = new Component(publicProps, ReactUpdateQueue)
+            try {
+                Share.ReactCurrentOwner.current = this
+                inst = new Component(publicProps, ReactUpdateQueue)
+            } finally {
+                Share.ReactCurrentOwner.current = null
+            } 
+        } else {
+            inst = Component(publicProps, ReactUpdateQueue)
+            if (inst == null || inst.render == null) {
+                renderedElement = inst
+                inst = new StatelessComponent(Component)
+            }
         }
 
         inst.props = publicProps
+        inst.refs = emptyObject
         inst.updater = ReactUpdateQueue
         
         this._instance = inst
@@ -71,7 +93,12 @@ export default class ReactCompositeComponent {
         }
         
         if (renderedElement === undefined) {
-            renderedElement = this._renderComponent()
+            try {
+                Share.ReactCurrentOwner.current = this
+                renderedElement = this._renderComponent()
+            } finally {
+                Share.ReactCurrentOwner.current = null
+            }
         }
 
         this._renderedComponent = this._instantiateReactComponent(
@@ -92,6 +119,13 @@ export default class ReactCompositeComponent {
         const inst = this._instance;
         const renderedComponent = inst.render()
         return renderedComponent
+    }
+
+    attachRef(ref, component) {
+        const inst = this.getPublicInstance()
+        const publicComponentInstance = component.getPublicInstance()
+        const refs = inst.refs === emptyObject ? (inst.refs = {}) : inst.refs
+        refs[ref] = publicComponentInstance
     }
 
     performUpdateIfNecessary(transaction) {
@@ -226,5 +260,13 @@ export default class ReactCompositeComponent {
             prevElement,
             nextElement
         )
+    }
+
+    getPublicInstance() {
+        const inst = this._instance
+        if (inst instanceof StatelessComponent) {
+            return null
+        }
+        return inst
     }
 }

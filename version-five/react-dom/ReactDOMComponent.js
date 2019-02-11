@@ -1,8 +1,12 @@
 import DOMLazyTree from './client/utils/DOMLazyTree'
 import ReactMultiChild from '../react-reconciler/ReactMultiChild'
-import { getNodeFromInstance as getNode } from  './client/ReactDOMComponentTree'
-
+import { getNodeFromInstance as getNode, precacheNode } from  './client/ReactDOMComponentTree'
+import DOMProperty from './DOMProperty'
+import DOMPropertyOperations from './DOMPropertyOperations'
+import EventPluginRegistry from '../shared/event/EventPluginRegistry'
+const { registrationNameModules } = EventPluginRegistry
 const CONTENT_TYPES = {'string': true, 'number': true}
+
 class ReactDOMComponent {
     constructor(element) {
         const tag = element.type
@@ -27,6 +31,10 @@ class ReactDOMComponent {
             
         const el = ownerDocument.createElement(this._currentElement.type)
 
+        precacheNode(this, el)
+
+        this._updateDOMProperties(null, props, transaction)
+
         const lazyTree = DOMLazyTree(el)
 
         this._createInitialChildren(transaction, props, lazyTree)
@@ -34,6 +42,34 @@ class ReactDOMComponent {
         const mountImage = lazyTree
 
         return mountImage
+    }
+
+    _updateDOMProperties(lastProps, nextProps, transaction) {
+        let propKey 
+        if (lastProps) {
+
+        }
+        for ( propKey in nextProps) {
+            const nextProp = nextProps[propKey]
+
+            if (registrationNameModules.hasOwnProperty(propKey)) {
+                if (nextProp) {
+                    // enqueuePutListener(this, propKey, nextProp, transaction)
+                } else if (lastProps) {
+                    //deleteListener(this, propKey)
+                }
+            } else if (
+                DOMProperty.properties[propKey] ||
+                DOMProperty.isCustomAttribute(propKey)
+            ) {
+                const node = getNode(this)
+                if (nextProp != null) {
+                    DOMPropertyOperations.setValueForProperty(node, propKey, nextProp)
+                } else {
+
+                }
+            }
+        }
     }
 
     _createInitialChildren(transaction, props, lazyTree) {
@@ -85,6 +121,10 @@ class ReactDOMComponent {
         } else if (nextChildren != null) {
             this.updateChildren(nextChildren, transaction)
         } 
+    }
+
+    getPublicInstance() {
+        return getNode(this)
     }
 
     getNativeNode() {

@@ -1,3 +1,9 @@
+import ReactRef from './ReactRef'
+
+function attachRefs() {
+    ReactRef.attachRefs(this, this._currentElement)
+}
+
 const ReactReconciler = {
     mountComponent: function (
         transaction,
@@ -10,6 +16,10 @@ const ReactReconciler = {
             nativeParent,
             nativeContainerInfo
         ) 
+        if (internalInstance._currentElement && 
+            internalInstance._currentElement.ref !== null) {
+            transaction.getReactMountReady().enqueue(attachRefs, internalInstance)
+        }
         return markup
     },
 

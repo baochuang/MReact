@@ -1,3 +1,4 @@
+const App = () => <div id='main'><TodoForm /></div>
 class TodoForm extends React.Component {
     constructor(props) {
       super(props)
@@ -29,6 +30,6 @@ class TodoForm extends React.Component {
 
 const rootContainer = document.querySelector('#root')
 
-const element = <TodoForm />
+const element = <App />
 
 ReactDOM.render(element, rootContainer)

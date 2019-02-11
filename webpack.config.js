@@ -16,14 +16,14 @@ module.exports = (env, argv) => {
         plugins: [
             new HtmlWebpackPlugin({
                 title: `React Version ${version} Demo`,
-                template: 'examples/template.html',
+                template: 'examples/public/template.html',
                 filename: '../demo.html',
                 inject: 'head',
-                demoFileName: `demo-${version}.js`
+                version: version
             })
         ]
     }
-    if (version === 'four') {
+    if (version === 'five') {
         config.entry['share'] = `./version-${version}/shared/index.js`
     } 
     return config

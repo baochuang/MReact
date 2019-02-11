@@ -1,9 +1,12 @@
 const REACT_ELEMENT_TYPE = (typeof Symbol === 'function' && Symbol.for && Symbol.for('react.element')) || 0xeac7
+const RESERVED_PROPS = { ref: true }
 
-const ReactElement = function(type, props) {
+const ReactElement = function(type, ref, owner, props) {
     const element = {
         $$typeof: REACT_ELEMENT_TYPE,
         type: type,
+        ref,
+        _owner: owner,
         props: props,
     }
     
@@ -13,16 +16,25 @@ const ReactElement = function(type, props) {
 ReactElement.createElement = function(type, config, children) {
 
     const props = {}
+    let ref = null
 
     if (config) {
+
+        let propName
         let defaultProps
+
+        if (config.ref) {
+            ref = config.ref   
+        }
 
         if (element.type && element.type.defaultProps) {
             defaultProps = element.type.defaultProps
         }
-
-        for (let propName in config) {
-            props[propName] = config[propName] || defaultProps[propName]
+        
+        for (propName in config) {
+            if (!RESERVED_PROPS.hasOwnProperty(propName)) {
+                props[propName] = config[propName] || defaultProps[propName]
+            }
         }
     } 
 
@@ -42,6 +54,8 @@ ReactElement.createElement = function(type, config, children) {
     
     return ReactElement(
         type,
+        ref,
+        Share.ReactCurrentOwner.current,
         props
     )
 }
