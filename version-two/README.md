@@ -141,3 +141,174 @@ componentDidUpdate
 ```
 transaction.getReactMountReady().enqueue(inst.componentDidUpdate.bind(inst, prevProps, prevState), inst)
 ```
+
+## setState实现
+```
+this.setState({
+    date: new Date()
+})
+```
+next step
+```
+this.updater.enqueueSetState(this, {
+    date: new Date()
+})
+```
+ReactUpdateQueue
+```
+ReactUpdateQueue.enqueueSetState(internalInstance) {
+    ...
+    ReactUpdates.enqueueUpdate(internalInstance)
+}
+```
+ReactUpdates.enqueueUpdate
+```
+{
+    if (!batchingStrategy.isBatchingUpdates) {
+        batchingStrategy.batchedUpdates(enqueueUpdate, component)
+    }
+
+    dirtyComponents.push(component)
+}
+```
+ReactDefaultBatchingStrategy.batchedUpdates
+```
+transaction.perform(callback, a, b, c)
+```
+flushBatchedUpdates:ReactUpdates.flushBatchedUpdates
+```
+function flushBatchedUpdates() {
+    let count = 1
+    while (dirtyComponents.length && count < 100) {
+        const transaction = ReactUpdatesFlushTransaction.getPooled()
+        transaction.perform(runBatchedUpdates, transaction)
+        ReactUpdatesFlushTransaction.release(transaction)
+        count++
+    }
+}
+```
+runBatchedUpdates
+```
+function runBatchedUpdates(transaction) {
+    const len = transaction.dirtyComponentsLength
+
+    dirtyComponents.sort(mountOrderComparator)
+
+    for (var i = 0; i < len; i++) {
+        var component = dirtyComponents[i]
+
+        ReactReconciler.performUpdateIfNecessary(
+            component,
+            transaction.reconcileTransaction
+        )
+    }
+}
+```
+updateComponent
+```
+updateComponent(
+    transaction,
+    prevParentElement,
+    nextParentElement,
+    ) {
+    const inst = this._instance
+
+    const nextState = this._processPendingState(nextProps)
+    
+}
+```
+_processPendingState
+```
+_processPendingState(props) {
+    const inst = this._instance
+    const queue = this._pendingStateQueue
+    this._pendingStateQueue = null
+    if (!queue) {
+        return inst.state
+    }
+
+    if (queue.length === 1) {
+        return queue[0]
+    }
+
+    const nextState = Object.assign({}, inst.state)
+
+    for (let i = 0; i < queue.length; i++) {
+        const partial = queue[i]
+        Object.assign(nextState, typeof partial === 'function' ? partial.call(inst, nextState, props) : partial)
+    }
+
+    return nextState
+}
+```
+_performComponentUpdate
+```
+_performComponentUpdate(
+    nextElement,
+    nextProps,
+    nextState,
+    transaction
+) {
+    
+}
+```
+_updateRenderedComponent
+```
+ReactReconciler.receiveComponent(
+    prevComponentInstance,
+    nextRenderedElement,
+    transaction
+)
+```
+ReactDOMComponent实例方法receiveComponent
+```
+receiveComponent(nextElement, transaction) {
+    const prevElement = this._currentElement
+    this._currentElement = nextElement
+    this.updateComponent(transaction, prevElement)
+}
+```
+ReactDOMComponent实例方法updateComponent
+```
+updateComponent(transaction, prevElement) {
+    const lastProps = prevElement.props
+    const nextProps = this._currentElement.props
+
+    this._updateDOMChildren(
+        lastProps,
+        nextProps,
+        transaction
+    )
+}
+```
+_updateDOMChildren
+```
+_updateDOMChildren(lastProps, nextProps, transaction) {
+    const lastContent = CONTENT_TYPES[typeof lastProps.children] ? lastProps.children : null
+    const nextContent = CONTENT_TYPES[typeof nextProps.children] ? nextProps.children : null
+
+    const lastChildren = lastContent != null ? null : lastProps.children
+    const nextChildren = nextContent != null ? null : nextProps.children
+
+    if (nextContent != null) {
+        if (lastContent !== nextContent) {
+        
+        }
+    } else if (nextChildren != null) {
+        this.updateChildren(nextChildren, transaction)
+    } 
+}
+```
+updateChildren
+```
+updateChildren: function(nextNestedChildrenElements, transaction) {
+    const prevChildren = this._renderedChildren
+    const removedNodes = {}
+    const nextChildren = this._reconcilerUpdateChildren(
+        prevChildren,
+        nextNestedChildrenElements,
+        removedNodes,
+        transaction
+    )
+}
+```
