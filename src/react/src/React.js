@@ -10,3 +10,5 @@ const React = {
     useState,
     createElement
 }
+
+export default React

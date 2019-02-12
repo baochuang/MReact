@@ -7,6 +7,8 @@ import {
 
 import { enableProfilerTimer } from '../../shared/ReactFeatureFlags'
 
+import { HostRoot } from '../../shared/ReactWorkTags'
+
 const isDevToolsPresent = false
 
 export function createHostRootFiber(isConcurrent) {
@@ -42,9 +44,12 @@ function FiberNode(
     // fiber
     this.return = null
     
+    this.updateQueue = null
     this.memoizedState = null
     
     this.mode = mode
+
+    this.alternate = null
 
     if (enableProfilerTimer) {
         

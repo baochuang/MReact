@@ -1,3 +1,7 @@
+const NormalPriority = 3
+
+let currentPriorityLevel = NormalPriority
+
 const hasNativePerformanceNow =
             typeof performance === 'object' && typeof performance.now === 'function'
             
@@ -29,6 +33,11 @@ if (globalValue && globalValue._schedMock) {
     getCurrentTime = globalImpl[3]
 }
 
+function unstable_getCurrentPriorityLevel() {
+    return currentPriorityLevel
+}
+
 export {
+    unstable_getCurrentPriorityLevel,
     getCurrentTime as unstable_now
 }

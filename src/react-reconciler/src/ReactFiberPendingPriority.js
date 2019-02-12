@@ -1,3 +1,5 @@
+import { NoWork } from './ReactFiberExpirationTime'
+
 function findNextExpirationTimeToWorkOn(completedExpirationTime, root) {
     const earliestSuspendedTime = root.earliestSuspendedTime
     const latestSuspendedTime = root.latestSuspendedTime

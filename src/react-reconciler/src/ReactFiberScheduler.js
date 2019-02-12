@@ -26,8 +26,13 @@ import {
     __interactionsRef
 } from '../../scheduler/src/Tracking'
 
+import {
+    unstable_getCurrentPriorityLevel as getCurrentPriorityLevel
+} from '../../scheduler/src/Scheduler'
+
 import { markPendingPriorityLevel } from './ReactFiberPendingPriority'
 
+import { recordScheduleUpdate } from './ReactDebugFiberPerf'
 let passiveEffectCallbackHandle = null
 let passiveEffectCallback = null
 
@@ -216,7 +221,7 @@ function scheduleWorkToRoot(fiber, expirationTime) {
         alternate.expirationTime = expirationTime
     }
 
-    let node = fiber.requestCurrentTime
+    let node = fiber.return
     let root = null
 
     if (node === null && fiber.tag === HostRoot) {
@@ -233,8 +238,9 @@ function scheduleWorkToRoot(fiber, expirationTime) {
             
             }
         }
-        return root
     }
+
+    return root
 }
 
 export {

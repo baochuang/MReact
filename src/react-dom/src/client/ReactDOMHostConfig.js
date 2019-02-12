@@ -1,3 +1,3 @@
 export {
     unstable_now as now
-} from 'scheduler'
+} from '../../../scheduler/src/Scheduler'

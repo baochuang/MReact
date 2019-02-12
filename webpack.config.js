@@ -2,7 +2,8 @@ const { resolve } = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 module.exports = (env, argv) => {
-    const version = env && env.version || process.env.version || 'three'
+    const version = env && env.version || process.env.version
+
     let config = {
         mode: 'development',
         entry: {
@@ -22,6 +23,13 @@ module.exports = (env, argv) => {
                 version: version
             })
         ]
+    }
+    if (!version) {
+        config.entry = {
+            'react': './src/react/index.js',
+            'react-dom': './src/react-dom/index.js'
+        }
+        config.plugins = []
     }
     if (version === 'five') {
         config.entry['share'] = `./version-${version}/shared/index.js`

@@ -1,3 +1,3 @@
-const ReactDOM = require('./src/client/ReactDOM')
+import ReactDOM from './src/client/ReactDOM'
 
-module.exports = ReactDOM.default || ReactDOM
+window.ReactDOM = ReactDOM
