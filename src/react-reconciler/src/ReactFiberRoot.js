@@ -6,6 +6,8 @@ import {
     NoWork
 } from './ReactFiberExpirationTime'
 
+import { noTimeout } from './ReactFiberHostConfig'
+
 export function createFiberRoot(
     containerInfo,
     isConcurrent,
@@ -19,23 +21,42 @@ export function createFiberRoot(
         root = ({
             current: uninitializedFiber,
             containerInfo: containerInfo,
+
             earliestPendingTime: NoWork,
             earliestSuspendedTime: NoWork,
             latestSuspendedTime: NoWork,
             latestPendingTime: NoWork,
+            latestPingedTime: NoWork,
 
-            hydrate
+            pendingCommitExpirationTime: NoWork,
+            finishedWork: null,
+            timeoutHandle: noTimeout,
+            hydrate,
+            nextExpirationTimeToWorkOn: NoWork,
+            firstBatch: null,
+            nextScheduledRoot: null,
+
+            memoizedInteractions: new Set(),
+            pendingInteractionMap: new Map()
         })
     } else {
         root = ({
             current: uninitializedFiber,
             containerInfo: containerInfo,
+
             earliestSuspendedTime: NoWork,
             latestSuspendedTime: NoWork,
             earliestPendingTime: NoWork,
             latestPendingTime: NoWork,
+            latestPingedTime: NoWork,
 
-            hydrate
+            pendingCommitExpirationTime: NoWork,
+            finishedWork: null,
+            timeoutHandle: noTimeout,
+            hydrate,
+            nextExpirationTimeToWorkOn: NoWork,
+            firstBatch: null,
+            nextScheduledRoot: null
         })
     }
 

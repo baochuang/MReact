@@ -37,7 +37,22 @@ function unstable_getCurrentPriorityLevel() {
     return currentPriorityLevel
 }
 
+function unstable_runWithPriority(priorityLevel, eventHandler) {
+    try {
+        eventHandler()
+    } finally {
+        flushImmediateWork()
+    }
+}
+
+function flushImmediateWork() {
+
+}
+
+export const unstable_ImmediatePriority = 1
+
 export {
     unstable_getCurrentPriorityLevel,
+    unstable_runWithPriority,
     getCurrentTime as unstable_now
 }

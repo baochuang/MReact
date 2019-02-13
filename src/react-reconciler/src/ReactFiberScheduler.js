@@ -6,7 +6,9 @@ import {
 } from './ReactFiberExpirationTime'
 
 import {
-    now
+    now,
+    noTimeout,
+    prepareForCommit
 } from './ReactFiberHostConfig'
 
 import {
@@ -19,7 +21,8 @@ import {
 } from '../../shared/ReactWorkTags'
 
 import {
-    enableSchedulerTracing
+    enableSchedulerTracing,
+    enableProfilerTimer
 } from '../../shared/ReactFeatureFlags'
 
 import {
@@ -27,12 +30,33 @@ import {
 } from '../../scheduler/src/Tracking'
 
 import {
-    unstable_getCurrentPriorityLevel as getCurrentPriorityLevel
+    unstable_getCurrentPriorityLevel as getCurrentPriorityLevel,
+    unstable_ImmediatePriority as ImmediatePriority,
+    unstable_runWithPriority as runWithPriority
 } from '../../scheduler/src/Scheduler'
 
-import { markPendingPriorityLevel } from './ReactFiberPendingPriority'
+import { 
+    markPendingPriorityLevel,
+    markCommittedPriorityLevels
+} from './ReactFiberPendingPriority'
 
 import { recordScheduleUpdate } from './ReactDebugFiberPerf'
+
+import ReactSharedInternals from '../../shared/ReactSharedInternals'
+
+const { ReactCurrentDispatcher } = ReactSharedInternals
+
+import { ContextOnlyDispatcher } from './ReactFiberHooks'
+
+import { createWorkInProgress } from './ReactFiber'
+
+import { 
+    PerformedWork, 
+    Snapshot,
+    ContentReset,
+    Ref
+} from '../../shared/ReactSideEffectTags'
+
 let passiveEffectCallbackHandle = null
 let passiveEffectCallback = null
 
@@ -54,9 +78,215 @@ let currentSchedulerTime = currentRendererTime
 let isWorking = false
 let isCommitting = false
 
+let nextRenderExpirationTime = NoWork
+let nextLatestAbsoluteTimeoutMs = -1
+let nextRenderDidError = false
+
+let nextEffect = null
+
 let nextRoot = null
+let nextUnitOfWork = null
 
 let firstScheduledRoot = null
+
+const NESTED_UPDATE_LIMIT = 50
+let nestedUpdateCount = 0
+let lastCommittedRootDuringThisBatch = null
+
+function commitAllHostEffects() {
+    while (nextEffect !== null) {
+
+        const effectTag = nextEffect.effectTag
+
+        if (effectTag & ContentReset) {
+            
+        }
+
+        if (effectTag & Ref) {
+            
+        }
+
+        let primaryEffectTag = effectTag & (Placement | Update | Deletion)
+
+        switch (primaryEffectTag) {
+            case Placement: {
+                commitPlacement(nextEffect)
+                nextEffect.effectTag &= ~Placement
+                break
+            }
+        }
+    }
+}
+
+function commitBeforeMutationLifecycles() {
+    while (nextEffect !== null) {
+      const effectTag = nextEffect.effectTag
+      if (effectTag & Snapshot) {
+
+      }
+  
+      nextEffect = nextEffect.nextEffect
+    }
+}
+
+function commitRoot(root, finishedWork) {
+    isWorking = true
+    isCommitting = true
+
+    root.pendingCommitExpirationTime = NoWork
+
+    const updateExpirationTimeBeforeCommit = finishedWork.expirationTime
+    const childExpirationTimeBeforeCommit = finishedWork.childExpirationTime
+    const earliestRemainingTimeBeforeCommit =
+        childExpirationTimeBeforeCommit > updateExpirationTimeBeforeCommit
+            ? childExpirationTimeBeforeCommit
+            : updateExpirationTimeBeforeCommit
+
+    markCommittedPriorityLevels(root, earliestRemainingTimeBeforeCommit)
+
+    let prevInteractions
+
+    if (enableSchedulerTracing) {
+        prevInteractions = __interactionsRef.current
+        __interactionsRef.current = root.memoizedInteractions
+    }
+
+    ReactCurrentOwner.current = null
+
+    let firstEffect
+
+    if (finishedWork.effectTag > PerformedWork) {
+        if (finishedWork.lastEffect !== null) {
+            finishedWork.lastEffect.nextEffect = finishedWork
+            firstEffect = finishedWork.firstEffect
+        } else {
+            firstEffect = finishedWork
+        }
+    }
+
+    prepareForCommit(root.containerInfo)
+
+    nextEffect = firstEffect
+
+    while (nextEffect !== null) {
+        let didError = false
+        let error
+        try {
+            commitBeforeMutationLifecycles()
+        } catch (e) {
+            didError = true
+            error = e
+        }
+        if (didError) {
+            if (nextEffect !== null) {
+                nextEffect = nextEffect.nextEffect
+            }
+        }
+    }
+
+    nextEffect = firstEffect
+
+    while (nextEffect !== null) {
+        let didError = false
+        let error
+
+        try {
+            commitAllHostEffects()
+        } catch (e) {
+            didError = true
+            error = e
+        }
+
+        if (didError) {
+            if (nextEffect !== null) {
+                nextEffect = nextEffect.nextEffect
+            }
+        }
+    }
+
+    resetAfterCommit(root.containerInfo)
+
+    root.current = finishedWork
+
+    nextEffect = firstEffect
+
+    while (nextEffect !== null) {
+        let didError = false
+        let error
+
+        try {
+            commitAllLifeCycles(root, committedExpirationTime)
+        } catch (e) {
+            didError = true
+            error = e
+        }
+
+        if (didError) {
+            if (nextEffect !== null) {
+                nextEffect = nextEffect.nextEffect
+            }
+        }
+    }
+
+    isCommitting = false
+    isWorking = false
+    onCommitRoot(finishedWork.stateNode)
+
+    const updateExpirationTimeAfterCommit = finishedWork.expirationTime
+    const childExpirationTimeAfterCommit = finishedWork.childExpirationTime
+    const earliestRemainingTimeAfterCommit =
+        childExpirationTimeAfterCommit > updateExpirationTimeAfterCommit
+            ? childExpirationTimeAfterCommit
+            : updateExpirationTimeAfterCommit
+    if (earliestRemainingTimeAfterCommit === NoWork) {
+        legacyErrorBoundariesThatAlreadyFailed = null
+    }
+    onCommit(root, earliestRemainingTimeAfterCommit)
+
+    if (enableSchedulerTracing) {
+        __interactionsRef.current = prevInteractions
+
+        let subscriber
+
+        try {
+            subscriber = __subscriberRef.current
+        } catch (error) {
+
+        } finally {
+
+        }
+    }
+}
+
+function completeRoot(
+    root,
+    finishedWork,
+    expirationTime
+) {
+    const firstBatch = root.firstBatch
+
+    root.finishedWork = null
+
+    if (root === lastCommittedRootDuringThisBatch) {
+        nestedUpdateCount++
+    } else {
+        lastCommittedRootDuringThisBatch = root
+        nestedUpdateCount = 0
+    }
+
+    runWithPriority(ImmediatePriority, () => {
+        commitRoot(root, finishedWork);
+    })
+}
+
+function onComplete(
+    root,
+    finishedWork,
+    expirationTime
+) {
+    root.pendingCommitExpirationTime = expirationTime
+    root.finishedWork = finishedWork
+}
 
 function unbatchedUpdates(fn, a) {
     if (isBatchingUpdates && !isUnbatchingUpdates) {
@@ -108,7 +338,34 @@ function findHighestPriorityRoot() {
     let highestPriorityWork = NoWork
     let highestPriorityRoot = null
     if (lastScheduledRoot !== null) {
-        
+        let previousScheduledRoot = lastScheduledRoot
+        let root = firstScheduledRoot
+
+        while (root !== null) {
+            const remainingExpirationTime = root.expirationTime
+
+            if (remainingExpirationTime === NoWork) {
+                if (root === root.nextScheduledRoot) {
+                    root.nextScheduledRoot = null
+                    firstScheduledRoot = lastScheduledRoot = null
+                    break
+                }
+            } else {
+                if (remainingExpirationTime > highestPriorityWork) {
+                    highestPriorityWork = remainingExpirationTime
+                    highestPriorityRoot = root
+                }
+                if (root === lastScheduledRoot) {
+                    break
+                }
+                if (highestPriorityWork === Sync) {
+                    break
+                }
+                
+                previousScheduledRoot = root
+                root = root.nextScheduledRoot
+            }
+        }
     }
 
     nextFlushedRoot = highestPriorityRoot;
@@ -152,6 +409,170 @@ function performWorkOnRoot(
 
     if (!isYieldy) {
         
+        let finishedWork = root.finishedWork
+
+        if (finishedWork !== null) {
+            // completeRoot(root, finishedWork, expirationTime)
+        } else {
+            root.finishedWork = null
+
+            const timeoutHandle = root.timeoutHandle
+
+            if (timeoutHandle !== noTimeout) {
+                
+            }
+
+            renderRoot(root, isYieldy)
+            finishedWork = root.finishedWork
+
+            if (finishedWork !== null) {
+                completeRoot(root, finishedWork, expirationTime)
+            }
+        }
+    }
+}
+
+function resetStack() {
+    if (nextUnitOfWork !== null) {
+        
+    }
+
+    nextRoot = null
+    nextRenderExpirationTime = NoWork
+    nextLatestAbsoluteTimeoutMs = -1
+    nextRenderDidError = false
+    nextUnitOfWork = null
+}
+
+function workLoop(isYieldy) {
+    if (!isYieldy) {
+      while (nextUnitOfWork !== null) {
+        nextUnitOfWork = performUnitOfWork(nextUnitOfWork);
+      }
+    } else {
+
+    }
+}
+
+function performUnitOfWork(workInProgress) {
+    const current = workInProgress.alternate
+
+    // startWorkTimer(workInProgress)
+
+    let next
+
+    if (enableProfilerTimer) {
+        
+    } else {
+        next = beginWork(current, workInProgress, nextRenderExpirationTime)
+        workInProgress.memoizedProps = workInProgress.pendingProps
+    }
+
+    if (next === null) {
+        
+    }
+
+    ReactCurrentOwner.current = null
+
+    return next
+}
+
+function renderRoot(root, isYieldy) {
+    flushPassiveEffects()
+
+    isWorking = true
+    
+    const  previousDispatcher = ReactCurrentDispatcher.current
+    ReactCurrentDispatcher.current = ContextOnlyDispatcher
+
+    const expirationTime = root.nextExpirationTimeToWorkOn
+
+    if (
+        expirationTime !== nextRenderExpirationTime ||
+        root !== nextRoot ||
+        nextUnitOfWork === null
+    ) {
+        resetStack()
+        nextRoot = root
+        nextRenderExpirationTime = expirationTime
+        nextUnitOfWork = createWorkInProgress(
+            nextRoot.current,
+            null,
+            nextRenderExpirationTime,
+        )
+        root.pendingCommitExpirationTime = NoWork
+
+        if (enableSchedulerTracing) {
+            const interactions = new Set()
+            root.pendingInteractionMap.forEach(
+                (scheduledInteractions, scheduledExpirationTime) => {
+                    if (scheduledExpirationTime >= expirationTime) {
+                        scheduledInteractions.forEach(interaction =>
+                            interactions.add(interaction),
+                        )
+                    }
+            })
+
+            root.memoizedInteractions = interactions
+
+            if (interactions.size > 0) {
+
+            }
+        }
+
+        let prevInteractions = null
+
+        if (enableSchedulerTracing) {
+            prevInteractions = __interactionsRef.current
+            __interactionsRef.current = root.memoizedInteractions
+        }
+
+        let didFatal = false
+        // Debug Fiber
+        // startWorkLoopTimer(nextUnitOfWork)
+
+        do {
+            try {
+                workLoop(isYieldy)
+            } catch (thrownValue) {
+                break
+            }
+        } while (true)
+
+        if (enableSchedulerTracing) {
+            __interactionsRef.current = prevInteractions;
+        }
+
+        isWorking = false
+        ReactCurrentDispatcher.current = previousDispatcher
+        // resetContextDependences()
+        // resetHooks()
+
+        if (didFatal) {
+            
+        }
+
+        if (nextUnitOfWork !== null) {
+        
+        }
+
+        const didCompleteRoot = true
+        // stopWorkLoopTimer(interruptedBy, didCompleteRoot)
+        const rootWorkInProgress = root.current.alternate
+
+        nextRoot = null
+        // interruptedBy = null
+
+        if (nextRenderDidError) {
+        
+        }
+
+        if (isYieldy && nextLatestAbsoluteTimeoutMs !== -1) {
+            
+        }
+
+        // Ready to commit
+        onComplete(root, rootWorkInProgress, expirationTime)
     }
 }
 
