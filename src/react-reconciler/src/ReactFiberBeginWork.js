@@ -1,9 +1,54 @@
 import { NoWork } from './ReactFiberExpirationTime'
-import { IndeterminateComponent, HostRoot } from '../../shared/ReactWorkTags'
+import { IndeterminateComponent, HostRoot, HostComponent } from '../../shared/ReactWorkTags'
+import { processUpdateQueue } from './ReactUpdateQueue'
+import { 
+    reconcileChildFibers,
+    mountChildFibers
+} from './ReactChildFiber'
+import { renderWithHooks } from './ReactFiberHooks'
 
 let didReceiveUpdate = false
 
 function updateHostRoot(current, workInProgress, renderExpirationTime) {
+    const updateQueue = workInProgress.updateQueue
+
+    const nextProps = workInProgress.pendingProps
+    const prevState = workInProgress.memoizedState
+    const prevChildren = prevState !== null ? prevState.element : null
+
+    processUpdateQueue(
+        workInProgress,
+        updateQueue,
+        nextProps,
+        null,
+        renderExpirationTime,
+    )
+
+    const nextState = workInProgress.memoizedState
+    const nextChildren = nextState.element
+    if (nextChildren === prevChildren) {
+        
+    }
+
+    const root = workInProgress.stateNode
+
+    if (
+        (current === null || current.child === null) &&
+        root.hydrate
+    ) {
+    } else {
+        reconcileChildren(
+            current,
+            workInProgress,
+            nextChildren,
+            renderExpirationTime,
+        )
+        // resetHydrationState()
+    }
+    return workInProgress.child
+}
+
+function updateHostComponent(current, workInProgress, renderExpirationTime) {
 
 }
 
@@ -21,7 +66,12 @@ export function reconcileChildren(
             renderExpirationTime,
         )
     } else {
-        
+        workInProgress.child = reconcileChildFibers(
+            workInProgress,
+            current.child,
+            nextChildren,
+            renderExpirationTime,
+        )
     }
 }
 function mountIndeterminateComponent(
@@ -75,13 +125,13 @@ function beginWork(
     const updateExpirationTime = workInProgress.expirationTime
 
     if (current !== null) {
-        
+
     } else {
         didReceiveUpdate = false
     }
 
     workInProgress.expirationTime = NoWork
-
+    debugger
     switch (workInProgress.tag) {
         case IndeterminateComponent: {
             const elementType = workInProgress.elementType
@@ -94,5 +144,13 @@ function beginWork(
           }
         case HostRoot: 
             return updateHostRoot(current, workInProgress, renderExpirationTime)
+        case HostComponent:
+            return updateHostComponent(current, workInProgress, renderExpirationTime)
+        case HostText:
+            return updateHostText(current, workInProgress)
     }
+}
+
+export {
+    beginWork
 }

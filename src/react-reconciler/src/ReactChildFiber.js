@@ -1,5 +1,8 @@
 import { REACT_ELEMENT_TYPE, REACT_FRAGMENT_TYPE} from '../../shared/ReactSymbols'
 import { Placement } from '../../shared/ReactSideEffectTags'
+import {
+    createFiberFromElement
+} from './ReactFiber'
 
 function ChildReconciler(shouldTrackSideEffects) {
     function deleteChild(returnFiber, childToDelete) {
@@ -121,4 +124,6 @@ function ChildReconciler(shouldTrackSideEffects) {
 
     return reconcileChildFibers
 }
+
+export const reconcileChildFibers = ChildReconciler(true)
 export const mountChildFibers = ChildReconciler(false)

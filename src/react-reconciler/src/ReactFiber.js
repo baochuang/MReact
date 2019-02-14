@@ -15,6 +15,8 @@ import {
 
 import { NoWork } from './ReactFiberExpirationTime'
 
+import { NoEffect } from '../../shared/ReactSideEffectTags'
+
 const isDevToolsPresent = false
 
 export function createFiberFromTypeAndProps(
@@ -80,9 +82,13 @@ export function createWorkInProgress(current, pendingProps, expirationTime) {
         workInProgress.alternate = current
         current.alternate = workInProgress
     } else {
-
+        workInProgress.firstEffect = null
     }
+
     workInProgress.expirationTime = current.expirationTime
+
+    workInProgress.updateQueue = current.updateQueue
+    
     return workInProgress
 }
 
@@ -128,6 +134,8 @@ function FiberNode(
     this.mode = mode
 
     // Effects
+    this.effectTag = NoEffect
+
     this.firstEffect = null
     this.lastEffect = null
 

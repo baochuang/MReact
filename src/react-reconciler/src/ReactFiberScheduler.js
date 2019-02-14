@@ -8,7 +8,8 @@ import {
 import {
     now,
     noTimeout,
-    prepareForCommit
+    prepareForCommit,
+    resetAfterCommit
 } from './ReactFiberHostConfig'
 
 import {
@@ -54,8 +55,15 @@ import {
     PerformedWork, 
     Snapshot,
     ContentReset,
-    Ref
+    Ref,
+    Placement,
+    Update,
+    Deletion
 } from '../../shared/ReactSideEffectTags'
+
+import ReactCurrentOwner from '../../react/src/ReactCurrentOwner'
+
+import { beginWork } from './ReactFiberBeginWork'
 
 let passiveEffectCallbackHandle = null
 let passiveEffectCallback = null
@@ -92,6 +100,78 @@ let firstScheduledRoot = null
 const NESTED_UPDATE_LIMIT = 50
 let nestedUpdateCount = 0
 let lastCommittedRootDuringThisBatch = null
+
+let legacyErrorBoundariesThatAlreadyFailed = null
+
+function completeUnitOfWork(workInProgress) {
+    while (true) {
+        const current = workInProgress.alternate
+
+        const returnFiber = workInProgress.return
+        const siblingFiber = workInProgress.sibling
+
+        if ((workInProgress.effectTag & Incomplete) === NoEffect) {
+            nextUnitOfWork = workInProgress
+
+            if (enableProfilerTimer) {
+                
+            } else {
+                nextUnitOfWork = completeWork(
+                    current,
+                    workInProgress,
+                    nextRenderExpirationTime,
+                )
+            }
+
+            // resetChildExpirationTime(workInProgress, nextRenderExpirationTime)
+            if (nextUnitOfWork !== null) {
+                return nextUnitOfWork
+            }
+
+            if (
+                returnFiber !== null &&
+                (returnFiber.effectTag & Incomplete) === NoEffect
+            ) {
+                if (returnFiber.firstEffect === null) {
+                    returnFiber.firstEffect = workInProgress.firstEffect
+                }
+                if (workInProgress.lastEffect !== null) {
+                    if (returnFiber.lastEffect !== null) {
+                      returnFiber.lastEffect.nextEffect = workInProgress.firstEffect
+                    }
+                    returnFiber.lastEffect = workInProgress.lastEffect
+                }
+
+                const effectTag = workInProgress.effectTag
+
+                if (effectTag > PerformedWork) {
+                    if (returnFiber.lastEffect !== null) {
+                      returnFiber.lastEffect.nextEffect = workInProgress
+                    } else {
+                      returnFiber.firstEffect = workInProgress
+                    }
+                    returnFiber.lastEffect = workInProgress
+                }
+
+                if (siblingFiber !== null) {
+                    return siblingFiber
+                } else if (returnFiber !== null) {
+                    workInProgress = returnFiber
+                    continue
+                } else {
+                    return null
+                }
+            } else {
+                
+            }
+        }
+    }
+}
+
+function onCommit(root, expirationTime) {
+    root.expirationTime = expirationTime
+    root.finishedWork = null
+}
 
 function commitAllHostEffects() {
     while (nextEffect !== null) {
@@ -130,6 +210,7 @@ function commitBeforeMutationLifecycles() {
 }
 
 function commitRoot(root, finishedWork) {
+
     isWorking = true
     isCommitting = true
 
@@ -162,27 +243,29 @@ function commitRoot(root, finishedWork) {
         } else {
             firstEffect = finishedWork
         }
+    } else {
+        firstEffect = finishedWork.firstEffect
     }
 
     prepareForCommit(root.containerInfo)
 
-    nextEffect = firstEffect
+    // nextEffect = firstEffect
 
-    while (nextEffect !== null) {
-        let didError = false
-        let error
-        try {
-            commitBeforeMutationLifecycles()
-        } catch (e) {
-            didError = true
-            error = e
-        }
-        if (didError) {
-            if (nextEffect !== null) {
-                nextEffect = nextEffect.nextEffect
-            }
-        }
-    }
+    // while (nextEffect !== null) {
+    //     let didError = false
+    //     let error
+    //     try {
+    //         commitBeforeMutationLifecycles()
+    //     } catch (e) {
+    //         didError = true
+    //         error = e
+    //     }
+    //     if (didError) {
+    //         if (nextEffect !== null) {
+    //             nextEffect = nextEffect.nextEffect
+    //         }
+    //     }
+    // }
 
     nextEffect = firstEffect
 
@@ -230,7 +313,7 @@ function commitRoot(root, finishedWork) {
 
     isCommitting = false
     isWorking = false
-    onCommitRoot(finishedWork.stateNode)
+    // onCommitRoot(finishedWork.stateNode)
 
     const updateExpirationTimeAfterCommit = finishedWork.expirationTime
     const childExpirationTimeAfterCommit = finishedWork.childExpirationTime
@@ -241,6 +324,7 @@ function commitRoot(root, finishedWork) {
     if (earliestRemainingTimeAfterCommit === NoWork) {
         legacyErrorBoundariesThatAlreadyFailed = null
     }
+
     onCommit(root, earliestRemainingTimeAfterCommit)
 
     if (enableSchedulerTracing) {
@@ -469,7 +553,7 @@ function performUnitOfWork(workInProgress) {
     }
 
     if (next === null) {
-        
+        next = completeUnitOfWork(workInProgress)
     }
 
     ReactCurrentOwner.current = null

@@ -4,5 +4,6 @@ import {
 } from './ReactDOMEventListener'
 
 export {
-    setEnabled
+    setEnabled,
+    isEnabled
 }

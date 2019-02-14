@@ -1,6 +1,41 @@
 import getActiveElement from './getActiveElement'
 import { getOffsets } from './ReactDOMSelection'
 
+function containsNode(outerNode, innerNode) {
+  if (!outerNode || !innerNode) {
+    return false;
+  } else if (outerNode === innerNode) {
+    return true;
+  } else if (isTextNode(outerNode)) {
+    return false;
+  } else if (isTextNode(innerNode)) {
+    return containsNode(outerNode, innerNode.parentNode);
+  } else if ('contains' in outerNode) {
+    return outerNode.contains(innerNode);
+  } else if (outerNode.compareDocumentPosition) {
+    return !!(outerNode.compareDocumentPosition(innerNode) & 16)
+  } else {
+    return false;
+  }
+}
+
+function isInDocument(node) {
+  return (
+    node &&
+    node.ownerDocument &&
+    containsNode(node.ownerDocument.documentElement, node)
+  )
+}
+
+export function restoreSelection(priorSelectionInformation) {
+    const curFocusedElem = getActiveElementDeep()
+    const priorFocusedElem = priorSelectionInformation.focusedElem
+    const priorSelectionRange = priorSelectionInformation.selectionRange
+    if (curFocusedElem !== priorFocusedElem && isInDocument(priorFocusedElem)) {
+
+    }
+} 
+
 function getActiveElementDeep() {
     let win = window
     let element = getActiveElement()
