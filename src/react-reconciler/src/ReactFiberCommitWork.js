@@ -4,7 +4,45 @@ import {
     appendChildToContainer
 } from './ReactFiberHostConfig'
 
+import { 
+    UnmountSnapshot,
+    NoEffect as NoHookEffect
+} from './ReactHookEffectTags'
+
 let supportsMutation = true
+
+function commitHookEffectList(
+    unmountTag,
+    mountTag,
+    finishedWork
+) {
+    const updateQueue = finishedWork.updateQueue
+    let lastEffect = updateQueue !== null ? updateQueue.lastEffect : null
+    if (lastEffect !== null) {
+        const firstEffect = lastEffect.next
+        let effect = firstEffect
+        do {
+            effect = effect.next
+        } while (effect !== firstEffect)
+    }
+}
+
+function commitBeforeMutationLifeCycles(
+    current,
+    finishedWork
+) {
+    switch (finishedWork.tag) {
+        case FunctionComponent:
+            commitHookEffectList(UnmountSnapshot, NoHookEffect, finishedWork)
+            return
+        case HostRoot:
+        case HostComponent:
+        case HostText:
+            return 
+        default:
+            return
+    }
+}
 
 function commitPlacement(finishedWork) {
     if (!supportsMutation) {
@@ -63,4 +101,8 @@ function commitPlacement(finishedWork) {
         node.sibling.return = node.return
         node = node.sibling
     }
+}
+
+export {
+    commitBeforeMutationLifeCycles
 }

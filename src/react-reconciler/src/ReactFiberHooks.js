@@ -19,6 +19,24 @@ let workInProgressHook = null
 
 let didScheduleRenderPhaseUpdate = false
 
+export function resetHooks() {
+    ReactCurrentDispatcher.current = ContextOnlyDispatcher
+
+    sideEffectTag = 0
+    currentlyRenderingFiber = null
+    firstWorkInProgressHook = null
+    remainingExpirationTime = NoWork
+    componentUpdateQueue = null
+    renderExpirationTime = NoWork
+    currentlyRenderingFiber = null;
+
+    firstCurrentHook = null
+    nextCurrentHook = null
+    workInProgressHook = null
+    
+    didScheduleRenderPhaseUpdate = false
+}
+
 function updateCallback() {
 
 }

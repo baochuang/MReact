@@ -1,4 +1,4 @@
-import { NoWork } from './ReactFiberExpirationTime'
+import { NoWork, Never } from './ReactFiberExpirationTime'
 import { IndeterminateComponent, HostRoot, HostComponent } from '../../shared/ReactWorkTags'
 import { processUpdateQueue } from './ReactUpdateQueue'
 import { 
@@ -6,8 +6,21 @@ import {
     mountChildFibers
 } from './ReactChildFiber'
 import { renderWithHooks } from './ReactFiberHooks'
+import { FunctionComponent } from '../../shared/ReactWorkTags'
+import { ContentReset } from '../../shared/ReactSideEffectTags'
+import { shouldSetTextContent } from './ReactFiberHostConfig'
+
+import { tryToClaimNextHydratableInstance } from './ReactFiberHydrationContext'
 
 let didReceiveUpdate = false
+
+function updateHostText(current, workInProgress) {
+    if (current === null) {
+      tryToClaimNextHydratableInstance(workInProgress)
+    }
+
+    return null
+}
 
 function updateHostRoot(current, workInProgress, renderExpirationTime) {
     const updateQueue = workInProgress.updateQueue
@@ -49,7 +62,28 @@ function updateHostRoot(current, workInProgress, renderExpirationTime) {
 }
 
 function updateHostComponent(current, workInProgress, renderExpirationTime) {
+    if (current === null) {
+    
+    } 
 
+    const type = workInProgress.type
+    const nextProps = workInProgress.pendingProps
+    const prevProps = current !== null ? current.memoizedProps : null
+
+    let nextChildren = nextProps.children
+    const isDirectTextChild = shouldSetTextContent(type, nextProps)
+
+    if (isDirectTextChild) {
+        nextChildren = null
+    } else if(prevProps !== null && shouldSetTextContent(type, prevProps)) {
+        workInProgress.effectTag |= ContentReset
+    } 
+
+    // markRef
+
+    reconcileChildren(current, workInProgress, nextChildren, renderExpirationTime)
+
+    return workInProgress.child
 }
 
 export function reconcileChildren(
@@ -109,6 +143,7 @@ function mountIndeterminateComponent(
     ) {
         
     } else {
+
         workInProgress.tag = FunctionComponent
 
         reconcileChildren(null, workInProgress, value, renderExpirationTime)
@@ -117,6 +152,7 @@ function mountIndeterminateComponent(
     }
 
 }
+
 function beginWork(
     current,
     workInProgress,
@@ -131,7 +167,7 @@ function beginWork(
     }
 
     workInProgress.expirationTime = NoWork
-    debugger
+
     switch (workInProgress.tag) {
         case IndeterminateComponent: {
             const elementType = workInProgress.elementType

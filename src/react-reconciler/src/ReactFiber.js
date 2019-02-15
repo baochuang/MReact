@@ -82,6 +82,7 @@ export function createWorkInProgress(current, pendingProps, expirationTime) {
         workInProgress.alternate = current
         current.alternate = workInProgress
     } else {
+        workInProgress.nextEffect = null
         workInProgress.firstEffect = null
     }
 
@@ -135,6 +136,7 @@ function FiberNode(
 
     // Effects
     this.effectTag = NoEffect
+    this.nextEffect = null
 
     this.firstEffect = null
     this.lastEffect = null

@@ -51,6 +51,8 @@ import { ContextOnlyDispatcher } from './ReactFiberHooks'
 
 import { createWorkInProgress } from './ReactFiber'
 
+import { commitBeforeMutationLifeCycles } from './ReactFiberCommitWork'
+
 import { 
     PerformedWork, 
     Snapshot,
@@ -195,6 +197,7 @@ function commitAllHostEffects() {
                 break
             }
         }
+        nextEffect = nextEffect.nextEffect
     }
 }
 
@@ -202,7 +205,8 @@ function commitBeforeMutationLifecycles() {
     while (nextEffect !== null) {
       const effectTag = nextEffect.effectTag
       if (effectTag & Snapshot) {
-
+        const current = nextEffect.alternate;
+        commitBeforeMutationLifeCycles(current, nextEffect)
       }
   
       nextEffect = nextEffect.nextEffect
@@ -249,23 +253,23 @@ function commitRoot(root, finishedWork) {
 
     prepareForCommit(root.containerInfo)
 
-    // nextEffect = firstEffect
+    nextEffect = firstEffect
 
-    // while (nextEffect !== null) {
-    //     let didError = false
-    //     let error
-    //     try {
-    //         commitBeforeMutationLifecycles()
-    //     } catch (e) {
-    //         didError = true
-    //         error = e
-    //     }
-    //     if (didError) {
-    //         if (nextEffect !== null) {
-    //             nextEffect = nextEffect.nextEffect
-    //         }
-    //     }
-    // }
+    while (nextEffect !== null) {
+        let didError = false
+        let error
+        try {
+            commitBeforeMutationLifecycles()
+        } catch (e) {
+            didError = true
+            error = e
+        }
+        if (didError) {
+            if (nextEffect !== null) {
+                nextEffect = nextEffect.nextEffect
+            }
+        }
+    }
 
     nextEffect = firstEffect
 
@@ -619,6 +623,7 @@ function renderRoot(root, isYieldy) {
             try {
                 workLoop(isYieldy)
             } catch (thrownValue) {
+                // resetHooks()
                 break
             }
         } while (true)
