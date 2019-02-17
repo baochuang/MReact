@@ -13,7 +13,7 @@ module.exports = (env, argv) => {
         output: {
             path: resolve(__dirname, 'examples/lib')
         },
-        devtool: 'source-map',
+        devtool: 'cheap-module-eval-source-map',
         plugins: [
             new HtmlWebpackPlugin({
                 title: `React Version ${version} Demo`,

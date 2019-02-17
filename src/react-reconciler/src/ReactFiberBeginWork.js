@@ -12,6 +12,8 @@ import { shouldSetTextContent } from './ReactFiberHostConfig'
 
 import { tryToClaimNextHydratableInstance } from './ReactFiberHydrationContext'
 
+import { pushHostContext, pushHostContainer  } from './ReactFiberHostContext'
+ 
 let didReceiveUpdate = false
 
 function updateHostText(current, workInProgress) {
@@ -22,7 +24,23 @@ function updateHostText(current, workInProgress) {
     return null
 }
 
+function pushHostRootContext(workInProgress) {
+    const root = workInProgress.stateNode
+    // if (root.pendingContext) {
+    //   pushTopLevelContextObject(
+    //     workInProgress,
+    //     root.pendingContext,
+    //     root.pendingContext !== root.context,
+    //   )
+    // } else if (root.context) {
+    //   // Should always be set
+    //   pushTopLevelContextObject(workInProgress, root.context, false)
+    // }
+    pushHostContainer(workInProgress, root.containerInfo)
+}
+
 function updateHostRoot(current, workInProgress, renderExpirationTime) {
+    pushHostRootContext(workInProgress)
     const updateQueue = workInProgress.updateQueue
 
     const nextProps = workInProgress.pendingProps
@@ -62,6 +80,8 @@ function updateHostRoot(current, workInProgress, renderExpirationTime) {
 }
 
 function updateHostComponent(current, workInProgress, renderExpirationTime) {
+    pushHostContext(workInProgress)
+
     if (current === null) {
     
     } 

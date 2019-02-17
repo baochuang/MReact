@@ -1,5 +1,12 @@
 let isHydrating = false
 let nextHydratableInstance = null
+let hydrationParentFiber = null
+
+function popHydrationState(fiber) {
+    if (fiber !== hydrationParentFiber) {
+        return false
+    }
+}
 
 function tryToClaimNextHydratableInstance(fiber) {
     if (!isHydrating) {
@@ -13,5 +20,6 @@ function tryToClaimNextHydratableInstance(fiber) {
 }
 
 export {
-    tryToClaimNextHydratableInstance
+    tryToClaimNextHydratableInstance,
+    popHydrationState
 }

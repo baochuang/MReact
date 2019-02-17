@@ -5,12 +5,109 @@ import {
 
 import { getSelectionInformation, restoreSelection } from './ReactInputSelection'
 
-import { COMMENT_NODE } from '../shared/HTMLNodeType'
+import { 
+    COMMENT_NODE,
+    DOCUMENT_NODE,
+    DOCUMENT_FRAGMENT_NODE
+} from '../shared/HTMLNodeType'
+
+import { precacheFiberNode, updateFiberProps } from './ReactDOMComponentTree'
+
+import {
+    createElement
+} from './ReactDOMComponent'
+
+import {
+    getChildNamespace
+} from '../shared/DOMNamespaces'
 
 let eventsEnabled = null
 let selectionInformation = null
 
 export const noTimeout = -1
+export const supportsMutation = true
+
+export function getRootHostContext(
+    rootContainerInstance,
+) {
+    let type;
+    let namespace;
+    const nodeType = rootContainerInstance.nodeType;
+    switch (nodeType) {
+      case DOCUMENT_NODE:
+      case DOCUMENT_FRAGMENT_NODE: {
+        type = nodeType === DOCUMENT_NODE ? '#document' : '#fragment'
+        let root = rootContainerInstance.documentElement
+        namespace = root ? root.namespaceURI : getChildNamespace(null, '')
+        break;
+      }
+      default: {
+        const container =
+          nodeType === COMMENT_NODE
+            ? rootContainerInstance.parentNode
+            : rootContainerInstance
+        const ownNamespace = container.namespaceURI || null
+        type = container.tagName
+        namespace = getChildNamespace(ownNamespace, type)
+        break
+      }
+    }
+
+    return namespace
+}
+
+export function getChildHostContext(
+    parentHostContext,
+    type,
+    rootContainerInstance
+) {
+    const parentNamespace = parentHostContext
+    return getChildNamespace(parentNamespace, type)
+}
+
+export function finalizeInitialChildren(
+    domElement,
+    type,
+    props,
+    rootContainerInstance,
+    hostContext
+) {
+    // setInitialProperties(domElement, type, props, rootContainerInstance)
+    // return shouldAutoFocusHostComponent(type, props)
+    return false
+}
+
+export function createInstance(
+    type,
+    props,
+    rootContainerInstance,
+    hostContext,
+    internalInstanceHandle
+) {
+    let parentNamespace
+
+    parentNamespace = hostContext
+    const domElement = createElement(
+      type,
+      props,
+      rootContainerInstance,
+      parentNamespace,
+    )
+    precacheFiberNode(internalInstanceHandle, domElement)
+    updateFiberProps(domElement, props)
+    return domElement
+}
+
+export function createTextInstance(
+    text,
+    rootContainerInstance,
+    hostContext,
+    internalInstanceHandle
+)   {
+    const textNode = createTextNode(text, rootContainerInstance)
+    precacheFiberNode(internalInstanceHandle, textNode)
+    return textNode
+}
 
 export function appendChildToContainer(
     container,

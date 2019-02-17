@@ -56,6 +56,8 @@ import { commitBeforeMutationLifeCycles } from './ReactFiberCommitWork'
 import { 
     PerformedWork, 
     Snapshot,
+    NoEffect,
+    Incomplete,
     ContentReset,
     Ref,
     Placement,
@@ -66,6 +68,8 @@ import {
 import ReactCurrentOwner from '../../react/src/ReactCurrentOwner'
 
 import { beginWork } from './ReactFiberBeginWork'
+
+import { completeWork } from './ReactFiberCompleteWork'
 
 let passiveEffectCallbackHandle = null
 let passiveEffectCallback = null
@@ -105,6 +109,36 @@ let lastCommittedRootDuringThisBatch = null
 
 let legacyErrorBoundariesThatAlreadyFailed = null
 
+function resetChildExpirationTime(
+    workInProgress,
+    renderTime
+) {
+    if (renderTime !== Never && workInProgress.childExpirationTime === Never) {
+        return
+    }
+
+    let newChildExpirationTime = NoWork
+
+    if (enableProfilerTimer) {
+        
+    } else {
+        let child = workInProgress.child
+        while (child !== null) {
+          const childUpdateExpirationTime = child.expirationTime
+          const childChildExpirationTime = child.childExpirationTime
+          if (childUpdateExpirationTime > newChildExpirationTime) {
+            newChildExpirationTime = childUpdateExpirationTime
+          }
+          if (childChildExpirationTime > newChildExpirationTime) {
+            newChildExpirationTime = childChildExpirationTime
+          }
+          child = child.sibling
+        }
+    }
+
+    workInProgress.childExpirationTime = newChildExpirationTime
+}
+
 function completeUnitOfWork(workInProgress) {
     while (true) {
         const current = workInProgress.alternate
@@ -125,7 +159,7 @@ function completeUnitOfWork(workInProgress) {
                 )
             }
 
-            // resetChildExpirationTime(workInProgress, nextRenderExpirationTime)
+            resetChildExpirationTime(workInProgress, nextRenderExpirationTime)
             if (nextUnitOfWork !== null) {
                 return nextUnitOfWork
             }
@@ -161,6 +195,7 @@ function completeUnitOfWork(workInProgress) {
                     workInProgress = returnFiber
                     continue
                 } else {
+                    // reach the root
                     return null
                 }
             } else {
@@ -168,6 +203,7 @@ function completeUnitOfWork(workInProgress) {
             }
         }
     }
+    return null
 }
 
 function onCommit(root, expirationTime) {
@@ -624,6 +660,18 @@ function renderRoot(root, isYieldy) {
                 workLoop(isYieldy)
             } catch (thrownValue) {
                 // resetHooks()
+                if (nextUnitOfWork === null) {
+                    didFatal = true
+                } else {
+                    const sourceFiber = nextUnitOfWork;
+                    let returnFiber = sourceFiber.return;
+                    if (returnFiber === null) {
+                        didFatal = true
+                    } else {
+                        nextUnitOfWork = completeUnitOfWork(sourceFiber)
+                        continue
+                    }
+                }
                 break
             }
         } while (true)

@@ -87,7 +87,8 @@ export function createWorkInProgress(current, pendingProps, expirationTime) {
     }
 
     workInProgress.expirationTime = current.expirationTime
-
+    workInProgress.childExpirationTime = current.childExpirationTime
+    
     workInProgress.updateQueue = current.updateQueue
     
     return workInProgress
@@ -126,6 +127,7 @@ function FiberNode(
 
     // fiber
     this.return = null
+    this.sibling = null
     
     this.pendingProps = pendingProps
     this.memoizedProps = null
@@ -142,6 +144,7 @@ function FiberNode(
     this.lastEffect = null
 
     this.expirationTime = NoWork
+    this.childExpirationTime = NoWork
 
     this.alternate = null
 
