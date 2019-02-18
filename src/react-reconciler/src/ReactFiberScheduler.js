@@ -51,7 +51,10 @@ import { ContextOnlyDispatcher } from './ReactFiberHooks'
 
 import { createWorkInProgress } from './ReactFiber'
 
-import { commitBeforeMutationLifeCycles } from './ReactFiberCommitWork'
+import { 
+    commitBeforeMutationLifeCycles,
+    commitPlacement
+} from './ReactFiberCommitWork'
 
 import { 
     PerformedWork, 
