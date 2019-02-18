@@ -1,6 +1,7 @@
 import { 
   getRootHostContainer,
-  getHostContext
+  getHostContext,
+  popHostContainer
 } from './ReactFiberHostContext'
 
 import {
@@ -14,7 +15,8 @@ import {
     createInstance,
     createTextInstance,
     supportsMutation,
-    finalizeInitialChildren
+    finalizeInitialChildren,
+    appendInitialChild
 } from './ReactFiberHostConfig'
 
 import {
@@ -24,6 +26,10 @@ import {
 import {
     popHydrationState
 } from './ReactFiberHydrationContext'
+
+import {
+  Placement
+} from '../../shared/ReactSideEffectTags'
 
 function prepareToHydrateHostInstance(
     workInProgress,

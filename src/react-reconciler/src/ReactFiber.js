@@ -9,6 +9,7 @@ import { enableProfilerTimer } from '../../shared/ReactFeatureFlags'
 
 import { 
     HostRoot, 
+    HostText,
     IndeterminateComponent,
     HostComponent 
 } from '../../shared/ReactWorkTags'
@@ -19,6 +20,15 @@ import { NoEffect } from '../../shared/ReactSideEffectTags'
 
 const isDevToolsPresent = false
 
+export function createFiberFromText(
+    content,
+    mode,
+    expirationTime
+) {
+    const fiber = createFiber(HostText, content, null, mode)
+    fiber.expirationTime = expirationTime
+    return fiber
+}
 export function createFiberFromTypeAndProps(
     type,
     key,
@@ -127,6 +137,7 @@ function FiberNode(
 
     // fiber
     this.return = null
+    this.child = null
     this.sibling = null
     
     this.pendingProps = pendingProps

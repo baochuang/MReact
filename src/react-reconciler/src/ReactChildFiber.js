@@ -1,8 +1,10 @@
 import { REACT_ELEMENT_TYPE, REACT_FRAGMENT_TYPE} from '../../shared/ReactSymbols'
 import { Placement } from '../../shared/ReactSideEffectTags'
 import {
-    createFiberFromElement
+    createFiberFromElement,
+    createFiberFromText
 } from './ReactFiber'
+
 import { isArray } from 'util';
 
 function ChildReconciler(shouldTrackSideEffects) {
@@ -11,7 +13,18 @@ function ChildReconciler(shouldTrackSideEffects) {
     }
 
     function deleteRemainingChildren(returnFiber, currentFirstChild) {
-
+        if (!shouldTrackSideEffects) {
+            return null
+        }
+      
+          // TODO: For the shouldClone case, this could be micro-optimized a bit by
+          // assuming that after the first child we've already added everything.
+          let childToDelete = currentFirstChild
+          while (childToDelete !== null) {
+            deleteChild(returnFiber, childToDelete)
+            childToDelete = childToDelete.sibling
+          }
+          return null
     }
 
     function mapRemainingChildren(returnFiber, currentFirstChild) {
@@ -75,7 +88,43 @@ function ChildReconciler(shouldTrackSideEffects) {
         newChild,
         expirationTime
     ) {
-
+        if (typeof newChild === 'string' || typeof newChild === 'number') {
+            const created = createFiberFromText(
+              '' + newChild,
+              returnFiber.mode,
+              expirationTime
+            )
+            created.return = returnFiber
+            return created
+          }
+      
+          if (typeof newChild === 'object' && newChild !== null) {
+            switch (newChild.$$typeof) {
+              case REACT_ELEMENT_TYPE: {
+                const created = createFiberFromElement(
+                  newChild,
+                  returnFiber.mode,
+                  expirationTime
+                )
+                // created.ref = coerceRef(returnFiber, null, newChild);
+                created.return = returnFiber
+                return created
+              }
+            }
+      
+            // if (isArray(newChild) || getIteratorFn(newChild)) {
+            //   const created = createFiberFromFragment(
+            //     newChild,
+            //     returnFiber.mode,
+            //     expirationTime,
+            //     null,
+            //   );
+            //   created.return = returnFiber;
+            //   return created;
+            // }
+          }
+      
+          return null
     }
 
     function reconcileChildrenArray(
@@ -108,6 +157,7 @@ function ChildReconciler(shouldTrackSideEffects) {
                 } else {
                     previousNewFiber.sibling = newFiber
                 }
+                previousNewFiber = newFiber
             }
             return resultingFirstChild
         }
@@ -167,6 +217,8 @@ function ChildReconciler(shouldTrackSideEffects) {
                 expirationTime
             )
         }
+
+        return deleteRemainingChildren(returnFiber, currentFirstChild)
     }
 
     return reconcileChildFibers

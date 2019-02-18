@@ -191,19 +191,19 @@ function completeUnitOfWork(workInProgress) {
                     }
                     returnFiber.lastEffect = workInProgress
                 }
-
-                if (siblingFiber !== null) {
-                    return siblingFiber
-                } else if (returnFiber !== null) {
-                    workInProgress = returnFiber
-                    continue
-                } else {
-                    // reach the root
-                    return null
-                }
-            } else {
-                
             }
+
+            if (siblingFiber !== null) {
+                return siblingFiber
+            } else if (returnFiber !== null) {
+                workInProgress = returnFiber
+                continue
+            } else {
+                // reach the root
+                return null
+            }
+        } else {
+
         }
     }
     return null
@@ -675,8 +675,8 @@ function renderRoot(root, isYieldy) {
                         continue
                     }
                 }
-                break
             }
+            break
         } while (true)
 
         if (enableSchedulerTracing) {

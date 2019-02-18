@@ -14,7 +14,8 @@ import {
 import { precacheFiberNode, updateFiberProps } from './ReactDOMComponentTree'
 
 import {
-    createElement
+    createElement,
+    createTextNode
 } from './ReactDOMComponent'
 
 import {
@@ -26,6 +27,13 @@ let selectionInformation = null
 
 export const noTimeout = -1
 export const supportsMutation = true
+
+export function appendInitialChild(
+    parentInstance,
+    child
+) {
+    parentInstance.appendChild(child)
+}
 
 export function getRootHostContext(
     rootContainerInstance,
