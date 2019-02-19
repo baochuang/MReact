@@ -3,9 +3,8 @@
     "version": "0.0.1",
     "scripts": {
         "build": "webpack",
-        "babel": "babel examples/src -d examples/lib",
-        "webpack": "export version=five&& webpack",
-        "start": "export version=five&& node scripts/start"
+        "babel": "babel src/demo.js -d lib",
+        "start": "webpack && node scripts/start"
     },
     "dependencies": {
         "react": "15.0.0",
