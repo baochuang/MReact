@@ -1,11 +1,11 @@
-import { createFiberRoot } from './ReactFiber'
+import { createFiberRoot } from './ReactFiberRoot'
+import { enqueueUpdate, createUpdate } from './ReactUpdateQueue'
 
 function scheduleRootUpdate(
     current,
-    element,
-    expirationTime
+    element
 ) {
-    const update = createUpdate(expirationTime)
+    const update = createUpdate()
 
     update.payload = {element}
 

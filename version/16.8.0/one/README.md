@@ -69,10 +69,12 @@ ReactFiber
 ```
 function createFiberRoot(containerInfo) {
     const uninitializedFiber = createHostRootFiber()
-    return {
+    const root = {
         current: uninitializedFiber,
         containerInfo: containerInfo
     }
+    uninitializedFiber.stateNode = root
+    return root
 }
 
 function createHostRootFiber() {
@@ -94,7 +96,9 @@ function FiberNode(
 ) {
     // instance
     this.tag = tag
-    
+    this.memoizedState = null
+    this.stateNode = null
+
     this.mode = mode
 }
 ```
@@ -130,14 +134,60 @@ function scheduleRootUpdate(
     current,
     element
 ) {
-    const update = createUpdate(expirationTime)
+    const update = createUpdate()
 
     update.payload = {element}
 
-    flushPassiveEffects()
     enqueueUpdate(current, update)
     scheduleWork(current, expirationTime)
   
     return expirationTime
 }
+```
+createUpdate
+```
+const UpdateState = 0
+
+function createUpdate() {
+    return {
+      tag: UpdateState,
+      payload: null,
+
+      next: null,
+      nextEffect: null
+    }
+}
+```
+enqueueUpdate
+```
+function enqueueUpdate(fiber, update) {
+    const queue = fiber.updateQueue = createUpdateQueue(fiber.memoizedState)
+
+    appendUpdateToQueue(queue, update)
+}
+```
+createUpdateQueue
+```
+function createUpdateQueue(baseState) {
+    const queue = {
+        firstUpdate: null,
+        lastUpdate: null
+    }
+    return queue
+}
+```
+appendUpdateToQueue
+```
+function appendUpdateToQueue(queue, update) {
+    if (queue.lastUpdate === null) {
+      queue.firstUpdate = queue.lastUpdate = update
+    } else {
+      queue.lastUpdate.next = update
+      queue.lastUpdate = update
+    }
+}
+```
+scheduleWork
+```
+
 ```
