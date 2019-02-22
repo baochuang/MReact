@@ -1,5 +1,12 @@
 import { createFiberRoot } from './ReactFiberRoot'
 import { enqueueUpdate, createUpdate } from './ReactUpdateQueue'
+import { scheduleWork } from './ReactFiberScheduler'
+
+function completeUnitOfWork(workInProgress) {
+    while (true) {
+        const current = workInProgress.alternate
+    }
+}
 
 function scheduleRootUpdate(
     current,

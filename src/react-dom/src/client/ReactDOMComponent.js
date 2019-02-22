@@ -4,8 +4,52 @@ import {
 
 import { Namespaces, getIntrinsicNamespace } from '../shared/DOMNamespaces'
 
+import setTextContent from './setTextContent'
 
 const {html: HTML_NAMESPACE} = Namespaces
+const CHILDREN = 'children'
+
+function setInitialDOMProperties(
+    tag,
+    domElement,
+    rootContainerElement,
+    nextProps,
+    isCustomComponentTag
+) {
+    for (const propKey in nextProps) {
+        const nextProp = nextProps[propKey]
+
+        if (propKey === CHILDREN) {
+            if (typeof nextProp === 'string') {
+                const canSetTextContent = tag !== 'textarea' || nextProp !== ''
+                if (canSetTextContent) {
+                    setTextContent(domElement, nextProp);
+                }
+            }
+        }
+    }
+}
+export function setInitialProperties(
+    domElement,
+    tag,
+    rawProps,
+    rootContainerElement
+) {
+    let props
+
+    switch (tag) {
+        default:
+            props = rawProps
+    }
+
+    setInitialDOMProperties(
+        tag,
+        domElement,
+        rootContainerElement,
+        props,
+        false,
+    )
+}
 
 function getOwnerDocumentFromRootContainer(
     rootContainerElement

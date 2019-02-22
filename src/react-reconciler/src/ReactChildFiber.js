@@ -5,7 +5,7 @@ import {
     createFiberFromText
 } from './ReactFiber'
 
-import { isArray } from 'util';
+const isArray = Array.isArray
 
 function ChildReconciler(shouldTrackSideEffects) {
     function deleteChild(returnFiber, childToDelete) {

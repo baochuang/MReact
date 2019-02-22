@@ -1,5 +1,5 @@
 import { NoWork, Never } from './ReactFiberExpirationTime'
-import { IndeterminateComponent, HostRoot, HostComponent } from '../../shared/ReactWorkTags'
+import { IndeterminateComponent, HostRoot, HostComponent, HostText } from '../../shared/ReactWorkTags'
 import { processUpdateQueue } from './ReactUpdateQueue'
 import { 
     reconcileChildFibers,

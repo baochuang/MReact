@@ -8,11 +8,56 @@ import { createWorkInProgress } from './ReactFiber'
 
 import { beginWork } from './ReactFiberBeginWork'
 
+import { 
+    PerformedWork
+} from '../../shared/ReactSideEffectTags'
+
+import { completeWork } from './ReactFiberCompleteWork'
+
 let firstScheduledRoot = null
 let lastScheduledRoot = null
 let nextFlushedRoot = null
 let nextUnitOfWork = null
 let nextRoot = null
+
+function completeUnitOfWork(workInProgress) {
+    while (true) {
+        const current = workInProgress.alternate
+
+        const returnFiber = workInProgress.return
+        const siblingFiber = workInProgress.sibling
+
+        nextUnitOfWork = completeWork(
+            current,
+            workInProgress,
+            nextRenderExpirationTime,
+        )
+
+        if (returnFiber !== null) {
+            returnFiber.firstEffect = workInProgress.firstEffect
+
+            const effectTag = workInProgress.effectTag
+
+            if (effectTag > PerformedWork) {
+                returnFiber.firstEffect = workInProgress
+                returnFiber.lastEffect = workInProgress
+            }
+
+        }
+
+        if (siblingFiber !== null) {
+            return siblingFiber
+        } else if (returnFiber !== null) {
+            workInProgress = returnFiber
+            continue
+        } else {
+            // reach the root
+            return null
+        }
+    }
+
+    return null
+}
 
 function performUnitOfWork(workInProgress) {
     const current = workInProgress.alternate
@@ -43,7 +88,8 @@ function renderRoot(root) {
     nextRoot = root
 
     nextUnitOfWork = createWorkInProgress(
-        nextRoot.current
+        nextRoot.current,
+        null
     )
 
     do {
@@ -103,7 +149,7 @@ function findHighestPriorityRoot() {
     nextFlushedRoot = highestPriorityRoot
 }
 
-function performWork(minExpirationTime) {
+function performWork() {
     findHighestPriorityRoot()
 
     while (

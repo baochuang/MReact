@@ -15,7 +15,8 @@ import { precacheFiberNode, updateFiberProps } from './ReactDOMComponentTree'
 
 import {
     createElement,
-    createTextNode
+    createTextNode,
+    setInitialProperties
 } from './ReactDOMComponent'
 
 import {
@@ -80,7 +81,7 @@ export function finalizeInitialChildren(
     rootContainerInstance,
     hostContext
 ) {
-    // setInitialProperties(domElement, type, props, rootContainerInstance)
+    setInitialProperties(domElement, type, props, rootContainerInstance)
     // return shouldAutoFocusHostComponent(type, props)
     return false
 }
