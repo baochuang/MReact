@@ -1,6 +1,13 @@
 import ReactCurrentOwner from './ReactCurrentOwner'
 import { REACT_ELEMENT_TYPE } from '../../shared/ReactSymbols'
 
+const RESERVED_PROPS = {
+    key: true,
+    ref: true,
+    __self: true,
+    __source: true
+}
+
 const ReactElement = function(type, key, ref, owner, props) {
     const element = {
         $$typeof: REACT_ELEMENT_TYPE,
@@ -25,6 +32,15 @@ export function createElement(type, config, children) {
     if (config) {
         ref = config.ref || null
         key = config.key ? '' + config.key : null
+
+        for (propName in config) {
+            if (
+              hasOwnProperty.call(config, propName) &&
+              !RESERVED_PROPS.hasOwnProperty(propName)
+            ) {
+              props[propName] = config[propName]
+            }
+        }
     }
 
     const childrenLength = arguments.length - 2

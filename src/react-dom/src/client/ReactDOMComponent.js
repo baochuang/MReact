@@ -6,8 +6,21 @@ import { Namespaces, getIntrinsicNamespace } from '../shared/DOMNamespaces'
 
 import setTextContent from './setTextContent'
 
+import { registrationNameModules } from '../../../events/EventPluginRegistry'
+
+import { listenTo } from '../events/ReactBrowserEventEmitter'
+
 const {html: HTML_NAMESPACE} = Namespaces
+
 const CHILDREN = 'children'
+
+function ensureListeningTo(rootContainerElement, registrationName) {
+    const isDocumentOrFragment = rootContainerElement.nodeType === DOCUMENT_NODE 
+    const doc = isDocumentOrFragment
+      ? rootContainerElement
+      : rootContainerElement.ownerDocument
+    listenTo(registrationName, doc)
+}
 
 function setInitialDOMProperties(
     tag,
@@ -23,12 +36,19 @@ function setInitialDOMProperties(
             if (typeof nextProp === 'string') {
                 const canSetTextContent = tag !== 'textarea' || nextProp !== ''
                 if (canSetTextContent) {
-                    setTextContent(domElement, nextProp);
+                    setTextContent(domElement, nextProp)
                 }
+            } else if (typeof nextProp === 'number') {
+                setTextContent(domElement, '' + nextProp)
             }
-        }
+        } else if (registrationNameModules.hasOwnProperty(propKey)) {
+            if (nextProp != null) {
+              ensureListeningTo(rootContainerElement, propKey);
+            }
+        } 
     }
 }
+
 export function setInitialProperties(
     domElement,
     tag,

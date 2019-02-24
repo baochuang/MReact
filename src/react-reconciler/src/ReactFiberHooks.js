@@ -3,6 +3,14 @@ import ReactSharedInternals from '../../shared/ReactSharedInternals'
 
 const { ReactCurrentDispatcher } = ReactSharedInternals
 
+import { 
+    computeExpirationForFiber,
+    flushPassiveEffects,
+    requestCurrentTime 
+} from './ReactFiberScheduler'
+
+import is from '../../shared/objectls'
+
 let firstWorkInProgressHook = null
 
 let remainingExpirationTime = NoWork
@@ -56,9 +64,60 @@ function dispatchAction(
       (alternate !== null && alternate === currentlyRenderingFiber)
     ) {
         didScheduleRenderPhaseUpdate = true
-    }
+    } else {
+        flushPassiveEffects()
 
-    // todo
+        const currentTime = requestCurrentTime()
+        const expirationTime = computeExpirationForFiber(currentTime, fiber)
+    
+        const update = {
+          expirationTime,
+          action,
+          eagerReducer: null,
+          eagerState: null,
+          next: null
+        }
+
+        // Append the update to the end of the list.
+        const last = queue.last
+        if (last === null) {
+            // This is the first update. Create a circular list.
+            update.next = update
+        } else {
+            const first = last.next
+            if (first !== null) {
+                // Still circular.
+                update.next = first
+            }
+            last.next = update
+        }
+        queue.last = update
+
+        if (
+            fiber.expirationTime === NoWork &&
+            (alternate === null || alternate.expirationTime === NoWork)
+        ) {
+            const eagerReducer = queue.eagerReducer
+            if (eagerReducer !== null) {
+                let prevDispatcher
+
+                try {
+                    const currentState = queue.eagerState
+                    const eagerState = eagerReducer(currentState, action)
+
+                    update.eagerReducer = eagerReducer
+                    update.eagerState = eagerState
+                    if (is(eagerState, currentState)) {
+                      return
+                    }
+                  } catch (error) {
+
+                  } finally {
+
+                  }
+            }
+        }
+    }
 }
 
 function basicStateReducer(state, action) {

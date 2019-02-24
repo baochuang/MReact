@@ -1,3 +1,6 @@
+// injection
+import './ReactDOMClientInjection'
+
 import {
     createContainer,
     unbatchedUpdates,
