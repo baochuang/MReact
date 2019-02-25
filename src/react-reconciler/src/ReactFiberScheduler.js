@@ -48,7 +48,7 @@ import ReactSharedInternals from '../../shared/ReactSharedInternals'
 
 const { ReactCurrentDispatcher } = ReactSharedInternals
 
-import { ContextOnlyDispatcher } from './ReactFiberHooks'
+import { ContextOnlyDispatcher, resetHooks } from './ReactFiberHooks'
 
 import { createWorkInProgress } from './ReactFiber'
 
@@ -579,7 +579,7 @@ function performWorkOnRoot(
         let finishedWork = root.finishedWork
 
         if (finishedWork !== null) {
-            // completeRoot(root, finishedWork, expirationTime)
+            completeRoot(root, finishedWork, expirationTime)
         } else {
             root.finishedWork = null
 
@@ -703,7 +703,8 @@ function renderRoot(root, isYieldy) {
             try {
                 workLoop(isYieldy)
             } catch (thrownValue) {
-                // resetHooks()
+                // resetContextDependences()
+                resetHooks()
                 if (nextUnitOfWork === null) {
                     didFatal = true
                 } else {
@@ -727,7 +728,7 @@ function renderRoot(root, isYieldy) {
         isWorking = false
         ReactCurrentDispatcher.current = previousDispatcher
         // resetContextDependences()
-        // resetHooks()
+        resetHooks()
 
         if (didFatal) {
             

@@ -31,10 +31,6 @@ function bailoutOnAlreadyFinishedWork(
       workInProgress.contextDependencies = current.contextDependencies
     }
   
-    if (enableProfilerTimer) {
-
-    }
-  
     // Check if the children have any pending work.
     const childExpirationTime = workInProgress.childExpirationTime
     if (childExpirationTime < renderExpirationTime) {
