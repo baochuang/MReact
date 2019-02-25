@@ -2,6 +2,8 @@ import { createFiberRoot } from './ReactFiberRoot'
 
 import {
     unbatchedUpdates,
+    batchedUpdates,
+    interactiveUpdates,
     requestCurrentTime,
     computeExpirationForFiber,
     flushPassiveEffects,
@@ -92,5 +94,7 @@ function scheduleRootUpdate(
 }
 
 export {
-    unbatchedUpdates
+    unbatchedUpdates,
+    batchedUpdates,
+    interactiveUpdates
 }

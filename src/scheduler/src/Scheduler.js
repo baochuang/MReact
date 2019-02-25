@@ -1,4 +1,5 @@
 const NormalPriority = 3
+const UserBlockingPriority = 2
 
 let currentPriorityLevel = NormalPriority
 
@@ -53,6 +54,7 @@ export const unstable_ImmediatePriority = 1
 
 export {
     unstable_getCurrentPriorityLevel,
+    UserBlockingPriority as unstable_UserBlockingPriority,
     unstable_runWithPriority,
     getCurrentTime as unstable_now
 }

@@ -33,6 +33,7 @@ import {
 import {
     unstable_getCurrentPriorityLevel as getCurrentPriorityLevel,
     unstable_ImmediatePriority as ImmediatePriority,
+    unstable_UserBlockingPriority as UserBlockingPriority,
     unstable_runWithPriority as runWithPriority
 } from '../../scheduler/src/Scheduler'
 
@@ -111,6 +112,45 @@ let nestedUpdateCount = 0
 let lastCommittedRootDuringThisBatch = null
 
 let legacyErrorBoundariesThatAlreadyFailed = null
+
+let lowestPriorityPendingInteractiveExpirationTime = NoWork
+
+function interactiveUpdates(fn, a, b) {
+    if (
+      !isBatchingUpdates &&
+      !isRendering &&
+      lowestPriorityPendingInteractiveExpirationTime !== NoWork
+    ) {
+      // Synchronously flush pending interactive updates.
+      performWork(lowestPriorityPendingInteractiveExpirationTime, false)
+      lowestPriorityPendingInteractiveExpirationTime = NoWork
+    }
+    const previousIsBatchingUpdates = isBatchingUpdates
+    isBatchingUpdates = true
+    try {
+      return runWithPriority(UserBlockingPriority, () => {
+        return fn(a, b)
+      })
+    } finally {
+      isBatchingUpdates = previousIsBatchingUpdates
+      if (!isBatchingUpdates && !isRendering) {
+        performSyncWork()
+      }
+    }
+}
+
+function batchedUpdates(fn, a) {
+    const previousIsBatchingUpdates = isBatchingUpdates
+    isBatchingUpdates = true
+    try {
+      return fn(a)
+    } finally {
+      isBatchingUpdates = previousIsBatchingUpdates
+      if (!isBatchingUpdates && !isRendering) {
+        performSyncWork()
+      }
+    }
+}
 
 function resetChildExpirationTime(
     workInProgress,
@@ -557,6 +597,7 @@ function performWorkOnRoot(
             }
         }
     }
+    isRendering = false
 }
 
 function resetStack() {
@@ -788,7 +829,28 @@ function scheduleWorkToRoot(fiber, expirationTime) {
     if (node === null && fiber.tag === HostRoot) {
         root = fiber.stateNode
     } else {
-
+        while (node !== null) {
+            alternate = node.alternate
+            if (node.childExpirationTime < expirationTime) {
+              node.childExpirationTime = expirationTime
+              if (
+                alternate !== null &&
+                alternate.childExpirationTime < expirationTime
+              ) {
+                alternate.childExpirationTime = expirationTime
+              }
+            } else if (
+              alternate !== null &&
+              alternate.childExpirationTime < expirationTime
+            ) {
+              alternate.childExpirationTime = expirationTime;
+            }
+            if (node.return === null && node.tag === HostRoot) {
+              root = node.stateNode
+              break
+            }
+            node = node.return
+        }
     }
 
     if (enableSchedulerTracing) {
@@ -805,6 +867,8 @@ function scheduleWorkToRoot(fiber, expirationTime) {
 }
 
 export {
+    batchedUpdates,
+    interactiveUpdates,
     unbatchedUpdates,
     requestCurrentTime,
     computeExpirationForFiber,

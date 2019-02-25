@@ -24,3 +24,12 @@ export function interactiveUpdates(fn, a, b) {
     return _interactiveUpdatesImpl(fn, a, b)
 }
   
+export function setBatchingImplementation(
+  batchedUpdatesImpl,
+  interactiveUpdatesImpl,
+  flushInteractiveUpdatesImpl
+) {
+  _batchedUpdatesImpl = batchedUpdatesImpl
+  _interactiveUpdatesImpl = interactiveUpdatesImpl
+  // _flushInteractiveUpdatesImpl = flushInteractiveUpdatesImpl
+}

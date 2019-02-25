@@ -3,18 +3,47 @@ import { IndeterminateComponent, HostRoot, HostComponent, HostText } from '../..
 import { processUpdateQueue } from './ReactUpdateQueue'
 import { 
     reconcileChildFibers,
-    mountChildFibers
+    mountChildFibers,
+    cloneChildFibers
 } from './ReactChildFiber'
 import { renderWithHooks } from './ReactFiberHooks'
 import { FunctionComponent } from '../../shared/ReactWorkTags'
 import { ContentReset } from '../../shared/ReactSideEffectTags'
 import { shouldSetTextContent } from './ReactFiberHostConfig'
 
-import { tryToClaimNextHydratableInstance } from './ReactFiberHydrationContext'
+import { 
+    tryToClaimNextHydratableInstance,
+    resetHydrationState
+} from './ReactFiberHydrationContext'
 
 import { pushHostContext, pushHostContainer  } from './ReactFiberHostContext'
  
 let didReceiveUpdate = false
+
+function bailoutOnAlreadyFinishedWork(
+    current,
+    workInProgress,
+    renderExpirationTime
+) {
+
+    if (current !== null) {
+      // Reuse previous context list
+      workInProgress.contextDependencies = current.contextDependencies
+    }
+  
+    if (enableProfilerTimer) {
+
+    }
+  
+    // Check if the children have any pending work.
+    const childExpirationTime = workInProgress.childExpirationTime
+    if (childExpirationTime < renderExpirationTime) {
+      return null
+    } else {
+      cloneChildFibers(current, workInProgress)
+      return workInProgress.child
+    }
+}
 
 function updateHostText(current, workInProgress) {
     if (current === null) {
@@ -74,7 +103,7 @@ function updateHostRoot(current, workInProgress, renderExpirationTime) {
             nextChildren,
             renderExpirationTime,
         )
-        // resetHydrationState()
+        resetHydrationState()
     }
     return workInProgress.child
 }
@@ -83,7 +112,7 @@ function updateHostComponent(current, workInProgress, renderExpirationTime) {
     pushHostContext(workInProgress)
 
     if (current === null) {
-    
+
     } 
 
     const type = workInProgress.type
@@ -181,10 +210,29 @@ function beginWork(
     const updateExpirationTime = workInProgress.expirationTime
 
     if (current !== null) {
+        const oldProps = current.memoizedProps
+        const newProps = workInProgress.pendingProps
 
+        if (oldProps !== newProps) {
+            didReceiveUpdate = true
+        } else if (updateExpirationTime < renderExpirationTime) {
+            didReceiveUpdate = false
+
+            switch (workInProgress.tag) {
+                case HostRoot:
+                    pushHostRootContext(workInProgress)
+                    resetHydrationState()
+                    break
+            }
+            return bailoutOnAlreadyFinishedWork(
+                current,
+                workInProgress,
+                renderExpirationTime,
+              )
+        }
     } else {
         didReceiveUpdate = false
-    }
+    } 
 
     workInProgress.expirationTime = NoWork
 

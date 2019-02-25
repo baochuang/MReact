@@ -4,6 +4,7 @@ import ReactSharedInternals from '../../shared/ReactSharedInternals'
 const { ReactCurrentDispatcher } = ReactSharedInternals
 
 import { 
+    scheduleWork,
     computeExpirationForFiber,
     flushPassiveEffects,
     requestCurrentTime 
@@ -117,6 +118,7 @@ function dispatchAction(
                   }
             }
         }
+        scheduleWork(fiber, expirationTime)
     }
 }
 

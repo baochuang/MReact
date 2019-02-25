@@ -1,11 +1,40 @@
 import { REACT_ELEMENT_TYPE, REACT_FRAGMENT_TYPE} from '../../shared/ReactSymbols'
 import { Placement } from '../../shared/ReactSideEffectTags'
+
 import {
     createFiberFromElement,
-    createFiberFromText
+    createFiberFromText,
+    createWorkInProgress
 } from './ReactFiber'
 
 const isArray = Array.isArray
+
+export function cloneChildFibers(current, workInProgress) {
+  
+    if (workInProgress.child === null) {
+      return
+    }
+  
+    let currentChild = workInProgress.child
+    let newChild = createWorkInProgress(
+      currentChild,
+      currentChild.pendingProps,
+      currentChild.expirationTime
+    )
+    workInProgress.child = newChild
+  
+    newChild.return = workInProgress
+    while (currentChild.sibling !== null) {
+      currentChild = currentChild.sibling
+      newChild = newChild.sibling = createWorkInProgress(
+        currentChild,
+        currentChild.pendingProps,
+        currentChild.expirationTime,
+      )
+      newChild.return = workInProgress
+    }
+    newChild.sibling = null
+}
 
 function ChildReconciler(shouldTrackSideEffects) {
     function deleteChild(returnFiber, childToDelete) {

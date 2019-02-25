@@ -1,6 +1,20 @@
+import {
+    supportsHydration
+} from './ReactFiberHostConfig'
+
 let isHydrating = false
 let nextHydratableInstance = null
 let hydrationParentFiber = null
+
+function resetHydrationState() {
+    if (!supportsHydration) {
+      return
+    }
+  
+    hydrationParentFiber = null
+    nextHydratableInstance = null
+    isHydrating = false
+}
 
 function popHydrationState(fiber) {
     if (fiber !== hydrationParentFiber) {
@@ -21,5 +35,6 @@ function tryToClaimNextHydratableInstance(fiber) {
 
 export {
     tryToClaimNextHydratableInstance,
-    popHydrationState
+    popHydrationState,
+    resetHydrationState
 }

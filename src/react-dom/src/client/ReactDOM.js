@@ -4,7 +4,9 @@ import './ReactDOMClientInjection'
 import {
     createContainer,
     unbatchedUpdates,
-    updateContainer
+    updateContainer,
+    batchedUpdates,
+    interactiveUpdates
 } from '../../../react-reconciler/inline.dom'
 
 import {
@@ -13,6 +15,14 @@ import {
 } from '../shared/HTMLNodeType'
 
 import { ROOT_ATTRIBUTE_NAME } from '../shared/DOMProperty'
+
+import { setBatchingImplementation } from '../../../events/ReactGenericBatching'
+
+setBatchingImplementation(
+    batchedUpdates,
+    interactiveUpdates,
+    null //flushInteractiveUpdates,
+)
 
 function getReactRootElementInContainer(container) {
     if (!container) {

@@ -23,6 +23,8 @@ import {
     getChildNamespace
 } from '../shared/DOMNamespaces'
 
+export const supportsHydration = true
+
 let eventsEnabled = null
 let selectionInformation = null
 
