@@ -12,6 +12,11 @@ import {
 
 import is from '../../shared/objectls'
 
+import {
+    Update as UpdateEffect,
+    Passive as PassiveEffect,
+} from '../../shared/ReactSideEffectTags'
+
 let firstWorkInProgressHook = null
 
 let remainingExpirationTime = NoWork
@@ -27,6 +32,18 @@ let nextCurrentHook  = null
 let workInProgressHook = null
 
 let didScheduleRenderPhaseUpdate = false
+
+export function bailoutHooks(
+    current,
+    workInProgress,
+    expirationTime
+  ) {
+    workInProgress.updateQueue = current.updateQueue
+    workInProgress.effectTag &= ~(PassiveEffect | UpdateEffect)
+    if (current.expirationTime <= expirationTime) {
+      current.expirationTime = NoWork
+    }
+}
 
 export function resetHooks() {
     ReactCurrentDispatcher.current = ContextOnlyDispatcher

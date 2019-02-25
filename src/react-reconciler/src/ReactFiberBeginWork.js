@@ -6,7 +6,7 @@ import {
     mountChildFibers,
     cloneChildFibers
 } from './ReactChildFiber'
-import { renderWithHooks } from './ReactFiberHooks'
+import { renderWithHooks, bailoutHooks } from './ReactFiberHooks'
 import { FunctionComponent } from '../../shared/ReactWorkTags'
 import { ContentReset } from '../../shared/ReactSideEffectTags'
 import { shouldSetTextContent } from './ReactFiberHostConfig'
@@ -18,7 +18,49 @@ import {
 
 import { pushHostContext, pushHostContainer  } from './ReactFiberHostContext'
  
+import { resolveDefaultProps } from './ReactFiberLazyComponent'
+
 let didReceiveUpdate = false
+
+function updateFunctionComponent(
+    current,
+    workInProgress,
+    Component,
+    nextProps,
+    renderExpirationTime
+) {
+    let nextChildren
+
+    nextChildren = renderWithHooks(
+        current,
+        workInProgress,
+        Component,
+        nextProps,
+        context,
+        renderExpirationTime,
+    )
+  
+    if (current !== null && !didReceiveUpdate) {
+      bailoutHooks(current, workInProgress, renderExpirationTime)
+      return bailoutOnAlreadyFinishedWork(
+        current,
+        workInProgress,
+        renderExpirationTime,
+      );
+    }
+  
+    // React DevTools reads this flag.
+    workInProgress.effectTag |= PerformedWork
+
+    reconcileChildren(
+      current,
+      workInProgress,
+      nextChildren,
+      renderExpirationTime,
+    )
+
+    return workInProgress.child
+}
 
 function bailoutOnAlreadyFinishedWork(
     current,
@@ -242,6 +284,21 @@ function beginWork(
               renderExpirationTime
             )
           }
+        case FunctionComponent: {
+            const Component = workInProgress.type
+            const unresolvedProps = workInProgress.pendingProps
+            const resolvedProps =
+                workInProgress.elementType === Component
+                    ? unresolvedProps
+                    : resolveDefaultProps(Component, unresolvedProps)
+            return updateFunctionComponent(
+                current,
+                workInProgress,
+                Component,
+                resolvedProps,
+                renderExpirationTime
+            )
+        }
         case HostRoot: 
             return updateHostRoot(current, workInProgress, renderExpirationTime)
         case HostComponent:

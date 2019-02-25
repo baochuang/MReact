@@ -1,6 +1,7 @@
 export const Placement = /*             */ 0b000000000010
 export const Update = /*                */ 0b000000000100
 export const Deletion = /*              */ 0b000000001000
+export const Passive = /*               */ 0b001000000000
 
 export const PerformedWork = /*         */ 0b000000000001
 export const Snapshot = /*              */ 0b000100000000
