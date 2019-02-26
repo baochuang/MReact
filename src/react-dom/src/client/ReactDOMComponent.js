@@ -10,9 +10,72 @@ import { registrationNameModules } from '../../../events/EventPluginRegistry'
 
 import { listenTo } from '../events/ReactBrowserEventEmitter'
 
+import isCustomComponent from '../shared/isCustomComponent'
+
 const {html: HTML_NAMESPACE} = Namespaces
 
 const CHILDREN = 'children'
+
+function updateDOMProperties(
+    domElement,
+    updatePayload,
+    wasCustomComponentTag,
+    isCustomComponentTag
+) {
+    // TODO: Handle wasCustomComponentTag
+    for (let i = 0; i < updatePayload.length; i += 2) {
+    //   const propKey = updatePayload[i];
+    //   const propValue = updatePayload[i + 1];
+    //   if (propKey === STYLE) {
+    //     setValueForStyles(domElement, propValue);
+    //   } else if (propKey === DANGEROUSLY_SET_INNER_HTML) {
+    //     setInnerHTML(domElement, propValue);
+    //   } else if (propKey === CHILDREN) {
+    //     setTextContent(domElement, propValue);
+    //   } else {
+    //     setValueForProperty(domElement, propKey, propValue, isCustomComponentTag);
+    //   }
+    }
+}
+
+// Apply the diff
+export function updateProperties(
+    domElement,
+    updatePayload,
+    tag,
+    lastRawProps,
+    nextRawProps
+) {
+    if (
+        tag === 'input' &&
+        nextRawProps.type === 'radio' &&
+        nextRawProps.name != null
+    ) {
+
+    }
+
+    const wasCustomComponentTag = isCustomComponent(tag, lastRawProps)
+    const isCustomComponentTag = isCustomComponent(tag, nextRawProps)
+
+    // Apply the diff.
+    updateDOMProperties(
+        domElement,
+        updatePayload,
+        wasCustomComponentTag,
+        isCustomComponentTag
+    )
+
+    // TODO: Ensure that an update gets scheduled if any of the special props
+    // changed.
+    switch (tag) {
+        case 'input':
+            break
+        case 'textarea':
+            break
+        case 'select':
+            break
+    }
+}
 
 function ensureListeningTo(rootContainerElement, registrationName) {
     const isDocumentOrFragment = rootContainerElement.nodeType === DOCUMENT_NODE 
@@ -43,7 +106,7 @@ function setInitialDOMProperties(
             }
         } else if (registrationNameModules.hasOwnProperty(propKey)) {
             if (nextProp != null) {
-              ensureListeningTo(rootContainerElement, propKey);
+              ensureListeningTo(rootContainerElement, propKey)
             }
         } 
     }
@@ -67,7 +130,7 @@ export function setInitialProperties(
         domElement,
         rootContainerElement,
         props,
-        false,
+        false
     )
 }
 

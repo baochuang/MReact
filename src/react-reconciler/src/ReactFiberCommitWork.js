@@ -8,7 +8,9 @@ import {
 
 import { ContentReset, Placement } from '../../shared/ReactSideEffectTags'
 import {
-    appendChildToContainer
+    appendChildToContainer,
+    commitTextUpdate,
+    commitUpdate
 } from './ReactFiberHostConfig'
 
 import { 
@@ -17,6 +19,45 @@ import {
 } from './ReactHookEffectTags'
 
 let supportsMutation = true
+
+function commitWork(current, finishedWork) {
+    if (!supportsMutation) {
+
+    }
+
+    switch (finishedWork.tag) {
+        case HostComponent: {
+            const instance = finishedWork.stateNode
+            if (instance != null) {
+                // Commit the work prepared earlier.
+                const newProps = finishedWork.memoizedProps
+                const oldProps = current !== null ? current.memoizedProps : newProps
+                const type = finishedWork.type
+
+                const updatePayload = finishedWork.updateQueue
+                finishedWork.updateQueue = null
+                if (updatePayload !== null) {
+                    commitUpdate(
+                        instance,
+                        updatePayload,
+                        type,
+                        oldProps,
+                        newProps,
+                        finishedWork
+                    )
+                }
+            }
+            return
+        }
+        case HostText: {
+            const textInstance = finishedWork.stateNode
+            const newText = finishedWork.memoizedProps
+            const oldText = current !== null ? current.memoizedProps : newText
+            commitTextUpdate(textInstance, oldText, newText)
+            return
+        }
+    }
+}
 
 function getHostSibling(fiber) {
     let node = fiber
@@ -165,5 +206,6 @@ function commitBeforeMutationLifeCycles(
 
 export {
     commitBeforeMutationLifeCycles,
-    commitPlacement
+    commitPlacement,
+    commitWork
 }

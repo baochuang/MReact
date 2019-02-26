@@ -54,7 +54,8 @@ import { createWorkInProgress } from './ReactFiber'
 
 import { 
     commitBeforeMutationLifeCycles,
-    commitPlacement
+    commitPlacement,
+    commitWork
 } from './ReactFiberCommitWork'
 
 import { 
@@ -273,6 +274,11 @@ function commitAllHostEffects() {
             case Placement: {
                 commitPlacement(nextEffect)
                 nextEffect.effectTag &= ~Placement
+                break
+            }
+            case Update: {
+                const current = nextEffect.alternate
+                commitWork(current, nextEffect)
                 break
             }
         }

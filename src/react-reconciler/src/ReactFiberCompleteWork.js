@@ -31,6 +31,10 @@ import {
   Placement
 } from '../../shared/ReactSideEffectTags'
 
+function markUpdate(workInProgress) {
+  workInProgress.effectTag |= Update;
+}
+
 function prepareToHydrateHostInstance(
     workInProgress,
     rootContainerInstance,
@@ -41,6 +45,7 @@ function prepareToHydrateHostInstance(
 
 let appendAllChildren
 let updateHostContainer
+let updateHostText
 
 if (supportsMutation) {
     appendAllChildren = function(
@@ -76,6 +81,17 @@ if (supportsMutation) {
 
     updateHostContainer = function(workInProgress) {
         // Noop
+    }
+
+    updateHostText = function(
+      current,
+      workInProgress,
+      oldText,
+      newText
+    ) {
+      if (oldText !== newText) {
+        markUpdate(workInProgress)
+      }
     }
 }
 
@@ -169,8 +185,8 @@ function completeWork(
         case HostText: {
             let newText = newProps
             if (current && workInProgress.stateNode != null) {
-                //const oldText = current.memoizedProps
-                // updateHostText(current, workInProgress, oldText, newText);
+                oldText = current.memoizedProps
+                updateHostText(current, workInProgress, oldText, newText);
             } else {
                 if (typeof newText !== 'string') {
 

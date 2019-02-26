@@ -16,7 +16,8 @@ import { precacheFiberNode, updateFiberProps } from './ReactDOMComponentTree'
 import {
     createElement,
     createTextNode,
-    setInitialProperties
+    setInitialProperties,
+    updateProperties
 } from './ReactDOMComponent'
 
 import {
@@ -30,6 +31,29 @@ let selectionInformation = null
 
 export const noTimeout = -1
 export const supportsMutation = true
+
+export function commitUpdate(
+    domElement,
+    updatePayload,
+    type,
+    oldProps,
+    newProps,
+    internalInstanceHandle
+) {
+    // Update the props handle so that we know which props are the ones with
+    // with current event handlers.
+    updateFiberProps(domElement, newProps)
+    // Apply the diff to the DOM node.
+    updateProperties(domElement, updatePayload, type, oldProps, newProps)
+}
+
+export function commitTextUpdate(
+    textInstance,
+    oldText,
+    newText
+) {
+    textInstance.nodeValue = newText
+}
 
 export function appendInitialChild(
     parentInstance,

@@ -8,7 +8,7 @@ import {
 } from './ReactChildFiber'
 import { renderWithHooks, bailoutHooks } from './ReactFiberHooks'
 import { FunctionComponent } from '../../shared/ReactWorkTags'
-import { ContentReset } from '../../shared/ReactSideEffectTags'
+import { ContentReset, PerformedWork } from '../../shared/ReactSideEffectTags'
 import { shouldSetTextContent } from './ReactFiberHostConfig'
 
 import { 
@@ -21,6 +21,10 @@ import { pushHostContext, pushHostContainer  } from './ReactFiberHostContext'
 import { resolveDefaultProps } from './ReactFiberLazyComponent'
 
 let didReceiveUpdate = false
+
+export function markWorkInProgressReceivedUpdate() {
+    didReceiveUpdate = true
+}
 
 function updateFunctionComponent(
     current,
@@ -36,7 +40,7 @@ function updateFunctionComponent(
         workInProgress,
         Component,
         nextProps,
-        context,
+        {},
         renderExpirationTime,
     )
   
@@ -265,8 +269,8 @@ function beginWork(
             return bailoutOnAlreadyFinishedWork(
                 current,
                 workInProgress,
-                renderExpirationTime,
-              )
+                renderExpirationTime
+            )
         }
     } else {
         didReceiveUpdate = false

@@ -92,6 +92,8 @@ export function createWorkInProgress(current, pendingProps, expirationTime) {
         workInProgress.alternate = current
         current.alternate = workInProgress
     } else {
+        workInProgress.effectTag = NoEffect
+
         workInProgress.nextEffect = null
         workInProgress.firstEffect = null
     }
@@ -99,8 +101,16 @@ export function createWorkInProgress(current, pendingProps, expirationTime) {
     workInProgress.expirationTime = current.expirationTime
     workInProgress.childExpirationTime = current.childExpirationTime
     
+    workInProgress.child = current.child
     workInProgress.updateQueue = current.updateQueue
-    
+    workInProgress.memoizedProps = current.memoizedProps
+    workInProgress.memoizedState = current.memoizedState
+    workInProgress.updateQueue = current.updateQueue
+    workInProgress.contextDependencies = current.contextDependencies
+
+    // These will be overridden during the parent's reconciliation
+    workInProgress.sibling = current.sibling
+
     return workInProgress
 }
 

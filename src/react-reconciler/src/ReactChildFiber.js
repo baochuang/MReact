@@ -7,6 +7,10 @@ import {
     createWorkInProgress
 } from './ReactFiber'
 
+import {
+    HostText
+} from '../../shared/ReactWorkTags'
+
 const isArray = Array.isArray
 
 export function cloneChildFibers(current, workInProgress) {
@@ -37,6 +41,65 @@ export function cloneChildFibers(current, workInProgress) {
 }
 
 function ChildReconciler(shouldTrackSideEffects) {
+
+    function updateSlot(
+        returnFiber,
+        oldFiber,
+        newChild,
+        expirationTime
+    ) {
+        const key = oldFiber !== null ? oldFiber.key : null
+
+        if (typeof newChild === 'string' || typeof newChild === 'number') {
+            if (key !== null) {
+                return null
+            }
+
+            return updateTextNode(
+                returnFiber,
+                oldFiber,
+                '' + newChild,
+                expirationTime
+            )
+        }
+
+        if (typeof newChild === 'object' && newChild !== null) {
+            switch (newChild.$$typeof) {
+                case REACT_ELEMENT_TYPE: {
+                    if (newChild.key === key) {
+                        if (newChild.type === REACT_FRAGMENT_TYPE) {
+
+                        }
+                        return updateElement(
+                            returnFiber,
+                            oldFiber,
+                            newChild,
+                            expirationTime
+                        )
+                    } else {
+                        return null
+                    }
+                }
+            }
+
+            if (isArray(newChild)) {
+                if (key !== null) {
+                    return null
+                }
+
+                return updateFragment(
+                    returnFiber,
+                    oldFiber,
+                    newChild,
+                    expirationTime,
+                    null,
+                )
+            }
+        }
+
+        return null
+    }
+
     function deleteChild(returnFiber, childToDelete) {
 
     }
@@ -61,7 +124,10 @@ function ChildReconciler(shouldTrackSideEffects) {
     }
     
     function useFiber(fiber, pendingProps, expirationTime) {
-
+        const clone = createWorkInProgress(fiber, pendingProps, expirationTime)
+        clone.index = 0
+        clone.sibling = null
+        return clone
     }
 
     function placeChild(newFiber, lastPlacedIndex, newIndex) {
@@ -81,7 +147,21 @@ function ChildReconciler(shouldTrackSideEffects) {
         textContent,
         expirationTime
     ) {
-
+        if (current === null || current.tag !== HostText) {
+            // Insert
+            // const created = createFiberFromText(
+            //   textContent,
+            //   returnFiber.mode,
+            //   expirationTime,
+            // );
+            // created.return = returnFiber
+            // return created
+          } else {
+            // Update
+            const existing = useFiber(current, textContent, expirationTime)
+            existing.return = returnFiber
+            return existing
+        }
     }
 
     function updateElement(
@@ -90,7 +170,15 @@ function ChildReconciler(shouldTrackSideEffects) {
         element,
         expirationTime
     ) {
+        if (current !== null && current.elementType === element.type) {
+            // Move based on index
+            const existing = useFiber(current, element.props, expirationTime)
+            // existing.ref = coerceRef(returnFiber, current, element);
+            existing.return = returnFiber
+            return existing
+        } else {
 
+        }
     }
 
     function updatePortal(
@@ -170,6 +258,45 @@ function ChildReconciler(shouldTrackSideEffects) {
         let lastPlacedIndex = 0
         let newIdx = 0
         let nextOldFiber = null
+        // Update
+        for (; oldFiber !== null && newIdx < newChildren.length; newIdx++) {
+            if (oldFiber.index > newIdx) {
+              nextOldFiber = oldFiber;
+              oldFiber = null
+            } else {
+              nextOldFiber = oldFiber.sibling
+            }
+            const newFiber = updateSlot(
+              returnFiber,
+              oldFiber,
+              newChildren[newIdx],
+              expirationTime,
+            )
+            if (newFiber === null) {
+                
+            }
+            if (shouldTrackSideEffects) {
+                if (oldFiber && newFiber.alternate === null) {
+                
+                }
+            }
+            lastPlacedIndex = placeChild(newFiber, lastPlacedIndex, newIdx)
+            if (previousNewFiber === null) {
+                // TODO: Move out of the loop. This only happens for the first run.
+                resultingFirstChild = newFiber
+            } else {
+                previousNewFiber.sibling = newFiber
+            }
+            previousNewFiber = newFiber
+            oldFiber = nextOldFiber
+        }
+        // Update
+        if (newIdx === newChildren.length) {
+            // We've reached the end of the new children. We can delete the rest.
+            deleteRemainingChildren(returnFiber, oldFiber);
+            return resultingFirstChild;
+        }
+        // Create
         if (oldFiber === null) {
             for (; newIdx < newChildren.length; newIdx++) {
                 const newFiber = createChild(
