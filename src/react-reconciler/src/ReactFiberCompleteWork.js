@@ -28,7 +28,8 @@ import {
 } from './ReactFiberHydrationContext'
 
 import {
-  Placement
+  Placement,
+  Update
 } from '../../shared/ReactSideEffectTags'
 
 function markUpdate(workInProgress) {
@@ -185,7 +186,7 @@ function completeWork(
         case HostText: {
             let newText = newProps
             if (current && workInProgress.stateNode != null) {
-                oldText = current.memoizedProps
+                const oldText = current.memoizedProps
                 updateHostText(current, workInProgress, oldText, newText);
             } else {
                 if (typeof newText !== 'string') {

@@ -8,7 +8,8 @@ import {
 } from './ReactFiber'
 
 import {
-    HostText
+    HostText,
+    Fragment
 } from '../../shared/ReactWorkTags'
 
 const isArray = Array.isArray
@@ -328,7 +329,36 @@ function ChildReconciler(shouldTrackSideEffects) {
         expirationTime
     ) {
         const key = element.key
-
+        let child = currentFirstChild
+        while (child !== null) {
+            // TODO: If key === null and child.key === null, then this only applies to
+            // the first item in the list.
+            if (child.key === key) {
+                if (
+                    child.tag === Fragment
+                    ? element.type === REACT_FRAGMENT_TYPE
+                    : child.elementType === element.type
+                ) {
+                    deleteRemainingChildren(returnFiber, child.sibling)
+                    const existing = useFiber(
+                        child,
+                        element.type === REACT_FRAGMENT_TYPE
+                        ? element.props.children
+                        : element.props,
+                        expirationTime
+                    )
+                    // existing.ref = coerceRef(returnFiber, child, element)
+                    existing.return = returnFiber
+                    return existing
+                } else {
+                    deleteRemainingChildren(returnFiber, child)
+                    break
+                }
+            } else {
+                deleteChild(returnFiber, child)
+            }
+            child = child.sibling
+        }
         if (element.type === REACT_FRAGMENT_TYPE) {
             
         } else {
