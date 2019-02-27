@@ -1,5 +1,22 @@
 const EVENT_POOL_SIZE = 10
 
+const EventInterface = {
+  type: null,
+  target: null,
+  // currentTarget is set when dispatching; no use in copying it here
+  currentTarget: function() {
+    return null
+  },
+  eventPhase: null,
+  bubbles: null,
+  cancelable: null,
+  timeStamp: function(event) {
+    return event.timeStamp || Date.now()
+  },
+  defaultPrevented: null,
+  isTrusted: null
+}
+
 function functionThatReturnsTrue() {
     return true
 }
@@ -86,6 +103,8 @@ function SyntheticEvent(
     this.isPropagationStopped = functionThatReturnsFalse
     return this 
 }
+
+SyntheticEvent.Interface = EventInterface
 
 SyntheticEvent.extend = function(Interface) {
     const Super = this

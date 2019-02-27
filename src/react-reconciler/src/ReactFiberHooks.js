@@ -322,12 +322,14 @@ function mountState(initialState) {
 
 const HooksDispatcherOnMount = {
     useCallback: mountCallback,
-    useState: mountState
+    useState: mountState,
+    // useReducer: mountReducer,
 }
 
 const HooksDispatcherOnUpdate = {
     useCallback: updateCallback,
     useState: updateState,
+    // useReducer: updateReducer
 }
 
 export function renderWithHooks(

@@ -1,10 +1,10 @@
 function Example() {
     const [count, setCount] = React.useState(0)
-
+    const newValue = count + 1
     return (
         <div>
             <p>You clicked {count} times</p>
-            <button onClick={() => { console.log(count);setCount(count + 1)}} >
+            <button onClick={() => setCount(newValue)} >
                 Click me
             </button>
         </div>

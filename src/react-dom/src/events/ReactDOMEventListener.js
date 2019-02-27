@@ -12,7 +12,18 @@ const {isInteractiveTopLevelEventType} = SimpleEventPlugin
 
 export let _enabled = true
 
+const CALLBACK_BOOKKEEPING_POOL_SIZE = 10
 const callbackBookkeepingPool = []
+
+function releaseTopLevelCallbackBookKeeping(instance) {
+  instance.topLevelType = null
+  instance.nativeEvent = null
+  instance.targetInst = null
+  instance.ancestors.length = 0
+  if (callbackBookkeepingPool.length < CALLBACK_BOOKKEEPING_POOL_SIZE) {
+    callbackBookkeepingPool.push(instance)
+  }
+}
 
 function findRootContainerNode(inst) {
 
@@ -96,7 +107,7 @@ export function dispatchEvent(
     // `preventDefault`.
     batchedUpdates(handleTopLevel, bookKeeping);
   } finally {
-    // releaseTopLevelCallbackBookKeeping(bookKeeping)
+    releaseTopLevelCallbackBookKeeping(bookKeeping)
   }
 
 }
