@@ -3,7 +3,7 @@
     "version": "0.0.1",
     "scripts": {
         "build": "webpack",
-        "babel": "babel src/demo.js -d lib",
+        "babel": "babel version/16.8/one/demo.js -d lib",
         "start": "webpack && node scripts/start"
     },
     "dependencies": {
