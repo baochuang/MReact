@@ -50,4 +50,4 @@ export function precacheFiberNode(hostInst, node) {
 
 export function updateFiberProps(node, props) {
     node[internalEventHandlersKey] = props
-  }
+}
