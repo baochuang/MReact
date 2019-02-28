@@ -18,6 +18,8 @@ function ReactElement(type, key, ref, owner, props) {
 
     _owner: owner
   }
+
+  return element
 }
 
 export function createElement(type, config, children) {

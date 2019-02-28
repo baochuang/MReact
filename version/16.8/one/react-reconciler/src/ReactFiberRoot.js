@@ -41,4 +41,8 @@ export function createFiberRoot(
       nextScheduledRoot: null
     }
   }
+
+  uninitializedFiber.stateNode = root
+
+  return root
 }

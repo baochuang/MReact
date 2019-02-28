@@ -3,7 +3,9 @@ import {
   DOCUMENT_NODE
 } from '../shared/HTMLNodeType'
 
-import { createContainer } from 'react-reconciler/ReactFiberRoot'
+import { unbatchedUpdates } from 'react-reconciler/src/ReactFiberScheduler'
+
+import { updateContainer, createContainer } from 'react-reconciler/inline.dom'
 
 // helper
 function getReactRootElementInContainer(container) {
@@ -29,6 +31,19 @@ function shouldHydrateDueToLegacyHeuristic(container) {
 
 // flow
 
+function ReactWork() {
+  this._callbacks = null
+  this._didCommit = false
+  // TODO: Avoid need to bind by replacing callbacks in the update queue with
+  // list of Work objects.
+  this._onCommit = this._onCommit.bind(this)
+}
+
+// TODO 目前还没运行到
+ReactWork.prototype._onCommit = function() {
+
+}
+
 function ReactRoot(
   container,
   isConcurrent,
@@ -36,6 +51,21 @@ function ReactRoot(
 ) {
   const root = createContainer(container, isConcurrent, hydrate);
   this._internalRoot = root;
+}
+
+ReactRoot.prototype.render = function(
+  children,
+  callback
+) {
+  const root = this._internalRoot
+  const work = new ReactWork()
+  callback = callback || null
+  // 本示例为null
+  if (callback !== null) {
+    // work.then(callback) 
+  }
+  updateContainer(children, root, null, work._onCommit)
+  return work
 }
 
 function legacyCreateRootFromDOMContainer(
@@ -58,7 +88,7 @@ function legacyCreateRootFromDOMContainer(
 }
 
 function legacyRenderSubtreeIntoContainer(
-  parentComponen,
+  parentComponent,
   children,
   container,
   forceHydrate,
@@ -72,6 +102,38 @@ function legacyRenderSubtreeIntoContainer(
       container,
       forceHydrate
     )
+
+    if (typeof callback === 'function') {
+    
+    }
+
+    // 初始绑定阶段不进行批处理
+    unbatchedUpdates(() => {
+      if (parentComponent != null) {
+        root.legacy_renderSubtreeIntoContainer(
+          parentComponent,
+          children,
+          callback
+        )
+      } else {
+        root.render(children, callback)
+      }
+    })
+  } else {
+    if (typeof callback === 'function') {
+      
+    }
+
+    // Update
+    if (parentComponent != null) {
+      root.legacy_renderSubtreeIntoContainer(
+        parentComponent,
+        children,
+        callback
+      )
+    } else {
+      root.render(children, callback)
+    }
   }
 }
 
