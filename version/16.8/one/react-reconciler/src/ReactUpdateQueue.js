@@ -1,3 +1,5 @@
+let hasForceUpdate = false
+
 export const UpdateState = 0
 
 function appendUpdateToQueue(queue, update) {

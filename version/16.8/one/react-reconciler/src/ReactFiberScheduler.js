@@ -67,6 +67,7 @@ let nestedUpdateCount = 0
 // process
 
 function performUnitOfWork(workInProgress) {
+  
   const current = workInProgress.alternate
 
   let next 

@@ -6,7 +6,18 @@ import {
   HostText
 } from 'shared/ReactWorkTags'
 
+import {
+  NoWork
+} from './ReactFiberExpirationTime'
+
+import { processUpdateQueue } from './ReactUpdateQueue'
+
 let didReceiveUpdate = false
+
+// handler 
+function updateHostRoot(current, workInProgress, renderExpirationTime) {
+
+}
 
 // process
 function beginWork(current, workInProgress, renderExpirationTime) {
@@ -16,7 +27,7 @@ function beginWork(current, workInProgress, renderExpirationTime) {
     const oldProps = current.memoizedProps
     const newProps = workInProgress.pendingProps
 
-    if (oldProps !== newProps || hasLegacyContextChanged()) {
+    if (oldProps !== newProps) { // 这边remove掉了hasLegacyContextChanged
       didReceiveUpdate = true
     } else if (updateExpirationTime < renderExpirationTime) { // update阶段才会被执行，内部状态变化
       didReceiveUpdate = false
@@ -42,19 +53,19 @@ function beginWork(current, workInProgress, renderExpirationTime) {
         )
       }
       case FunctionComponent: {
-        const Component = workInProgress.type
-        const unresolvedProps = workInProgress.pendingProps
-        const resolvedProps =
-          workInProgress.elementType === Component
-            ? unresolvedProps
-            : resolveDefaultProps(Component, unresolvedProps)
-        return updateFunctionComponent(
-          current,
-          workInProgress,
-          Component,
-          resolvedProps,
-          renderExpirationTime
-        )
+        // const Component = workInProgress.type
+        // const unresolvedProps = workInProgress.pendingProps
+        // const resolvedProps =
+        //   workInProgress.elementType === Component
+        //     ? unresolvedProps
+        //     : resolveDefaultProps(Component, unresolvedProps)
+        // return updateFunctionComponent(
+        //   current,
+        //   workInProgress,
+        //   Component,
+        //   resolvedProps,
+        //   renderExpirationTime
+        // )
       }
       case HostRoot:
         return updateHostRoot(current, workInProgress, renderExpirationTime)
